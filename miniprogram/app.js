@@ -9,8 +9,8 @@ App({
 
   onLaunch() {
     console.log('小程序启动')
-    // 启用微信登录
-    this.doLogin()
+    // 开发阶段暂时禁用微信登录，正式上线后取消注释
+    // this.doLogin()
   },
 
   // 微信登录
