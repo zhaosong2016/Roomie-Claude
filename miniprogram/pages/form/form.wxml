@@ -1,0 +1,84 @@
+<!-- pages/form/form.wxml -->
+<view class="container">
+  <view class="page-title">填写信息进入拼房池</view>
+
+  <view class="form-section">
+    <text class="label">你的名字/昵称</text>
+    <input class="input" placeholder="怎么称呼你？" bindinput="onNameInput" value="{{name}}" />
+  </view>
+
+  <view class="form-section">
+    <text class="label">你的微信号</text>
+    <input class="input" type="text" placeholder="用于匹配成功后联系" bindinput="onWechatInput" value="{{wechat_id}}" />
+  </view>
+
+  <view class="form-section">
+    <text class="label">你的性别</text>
+    <radio-group bindchange="onGenderChange">
+      <label><radio value="female" />女</label>
+      <label><radio value="male" />男</label>
+    </radio-group>
+  </view>
+
+  <view class="form-section">
+    <text class="label">打算住几晚</text>
+    <picker mode="date" value="{{check_in}}" start="{{today}}" bindchange="onCheckInChange">
+      <view class="picker">入住：{{check_in || '请选择日期'}}</view>
+    </picker>
+    <picker mode="date" value="{{check_out}}" start="{{today}}" bindchange="onCheckOutChange" style="margin-top:10px">
+      <view class="picker">退房：{{check_out || '请选择日期'}}</view>
+    </picker>
+  </view>
+
+  <view class="form-section">
+    <text class="label">是否吸烟</text>
+    <radio-group bindchange="onSmokingChange">
+      <label><radio value="no" />否</label>
+      <label><radio value="yes" />是</label>
+    </radio-group>
+  </view>
+
+  <view class="divider"></view>
+
+  <view class="form-section">
+    <text class="label">睡眠习惯摸底</text>
+
+    <text class="sub-label">1. 你的"作息"倾向</text>
+    <radio-group bindchange="onScheduleChange">
+      <label class="radio-block"><radio value="early_bird" /> [早睡鸟] 习惯早睡早起，生物钟稳定</label>
+      <label class="radio-block"><radio value="night_owl" /> [夜猫子] 越晚越精神，深夜才是自由时间</label>
+    </radio-group>
+
+    <text class="sub-label">2. 你的"抗噪"等级</text>
+    <radio-group bindchange="onNoiseInChange">
+      <label class="radio-block"><radio value="weak" /> [神经衰弱] 有动静就醒</label>
+      <label class="radio-block"><radio value="medium" /> [普通玩家] 正常翻身没问题</label>
+      <label class="radio-block"><radio value="strong" /> [雷打不动] 倒头就睡，浑然不觉</label>
+    </radio-group>
+
+    <text class="sub-label">3. 你的"出声"分贝</text>
+    <radio-group bindchange="onNoiseOutChange">
+      <label class="radio-block"><radio value="silent" /> [寂静模式] 非常安静，基本无声</label>
+      <label class="radio-block"><radio value="loud" /> [混响模式] 偶尔翻身或磨牙</label>
+      <label class="radio-block"><radio value="bass" /> [低音炮模式] 呼噜明显哈哈</label>
+    </radio-group>
+  </view>
+
+  <view class="form-section">
+    <checkbox-group bindchange="onUserAgreementChange">
+      <label class="agreement">
+        <checkbox value="agreed" checked="{{user_agreement}}" />
+        我已阅读并同意<text class="link" bindtap="onViewUserAgreement">《用户协议》</text>
+      </label>
+    </checkbox-group>
+
+    <checkbox-group bindchange="onPrivacyAgreementChange" style="margin-top: 20rpx;">
+      <label class="agreement">
+        <checkbox value="agreed" checked="{{privacy_agreement}}" />
+        我已阅读并同意<text class="link" bindtap="onViewPrivacyPolicy">《隐私政策》</text>
+      </label>
+    </checkbox-group>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit" disabled="{{!user_agreement || !privacy_agreement}}">确认进入拼房池</button>
+</view>

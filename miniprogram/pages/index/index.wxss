@@ -1,0 +1,172 @@
+/* pages/index/index.wxss */
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* 氛围底图：铺满全屏并置于底层 */
+.bg-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* 内容层 */
+.content-layer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 40rpx;
+}
+
+/* 顶部标题卡片 */
+.header-section {
+  margin-top: 60rpx;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 30rpx 50rpx;
+  border-radius: 20rpx;
+  backdrop-filter: blur(8px);
+  text-align: center;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.main-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #007aff;
+  margin-bottom: 8rpx;
+}
+
+.sub-title {
+  font-size: 30rpx;
+  color: #888;
+}
+
+/* 数据统计区 */
+.stats-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 280rpx;
+  margin-bottom: 60rpx;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.95);
+  width: 78%;
+  padding: 45rpx 0;
+  border-radius: 30rpx;
+  text-align: center;
+  box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.1);
+  margin-bottom: 30rpx;
+}
+
+.big-number {
+  font-size: 80rpx;
+  font-weight: bold;
+  color: #444;
+}
+
+.desc-text {
+  font-size: 32rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 底部按钮 */
+.footer-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 60rpx;
+  margin-top: 20rpx;
+}
+
+.main-btn {
+  background-color: #007aff;
+  color: #ffffff !important;
+  width: 520rpx;
+  height: 110rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 55rpx;
+  font-size: 38rpx;
+  font-weight: bold;
+  box-shadow: 0 15rpx 40rpx rgba(0, 122, 255, 0.4);
+}
+
+/* 输入口令区域 */
+.code-input-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 280rpx;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40rpx;
+  border-radius: 30rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.1);
+}
+
+.input-label {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 24rpx;
+  font-weight: 500;
+}
+
+.code-input {
+  width: 100%;
+  padding: 24rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  background-color: white;
+  margin-bottom: 16rpx;
+}
+
+.input-hint {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.submit-btn {
+  background-color: #007aff;
+  color: #ffffff !important;
+  width: 100%;
+  height: 90rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 45rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+/* 组织者链接 */
+.organizer-link {
+  font-size: 28rpx;
+  color: #007ACC;
+  text-decoration: underline;
+  margin-top: 40rpx;
+  margin-bottom: 40rpx;
+}

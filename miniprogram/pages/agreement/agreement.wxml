@@ -1,0 +1,114 @@
+<!-- pages/agreement/agreement.wxml -->
+<view class="container">
+  <scroll-view class="content" scroll-y="true">
+    <!-- 用户协议 -->
+    <view wx:if="{{type === 'user'}}">
+      <view class="important-notice">
+        <text class="notice-title">【重要提示】</text>
+        <text class="notice-item">1. 信息公开：匹配成功后，您的姓名、微信号、入住日期、生活习惯等信息将对匹配对象可见</text>
+        <text class="notice-item">2. 自担风险：本服务仅提供信息匹配，不对拼房结果、人身财产安全承担责任</text>
+        <text class="notice-item">3. 真实信息：您应确保提交信息真实准确</text>
+        <text class="notice-item">4. 解除匹配：您可随时解除匹配，但已交换的联系方式无法撤回</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">一、服务说明</text>
+        <text class="section-text">1.1 Space One 拼房实验室是一个帮助参加同一活动的用户匹配合适室友的信息服务平台。</text>
+        <text class="section-text">1.2 本服务通过收集用户的基本信息和生活习惯偏好，运用匹配算法为用户推荐可能合适的室友。</text>
+        <text class="section-text">1.3 本服务不提供住宿预订、支付结算等服务，仅提供信息匹配功能。</text>
+        <text class="section-text">1.4 本服务由 Space One 拼房实验室开发者提供。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">二、用户注册与使用</text>
+        <text class="section-text">2.1 您需通过微信小程序登录使用本服务。</text>
+        <text class="section-text">2.2 您需提供真实、准确、完整的个人信息。</text>
+        <text class="section-text">2.3 您承诺对提交信息的真实性负责，因虚假信息导致的一切后果由您自行承担。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">三、匹配规则</text>
+        <text class="section-text">3.1 匹配成功后，双方信息将互相可见，包括姓名、微信号、入住日期、生活习惯等。</text>
+        <text class="section-text">3.2 您可以随时解除匹配，但已交换的联系方式无法撤回。</text>
+        <text class="section-text">3.3 曾经匹配并解除的用户，系统将不再为您推荐该用户。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">四、免责声明</text>
+        <text class="section-text">4.1 本服务仅提供信息匹配，不对以下事项承担责任：匹配对象的真实性可靠性、拼房过程中的人身财产安全、用户之间的纠纷。</text>
+        <text class="section-text">4.2 您理解并同意，拼房涉及人身财产安全，您应当：自行核实对方身份、谨慎选择室友、妥善保管个人财物。</text>
+        <text class="section-text">4.3 您使用本服务即表示您已充分理解并自愿承担拼房可能产生的所有风险。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">五、联系我们</text>
+        <text class="section-text">小程序相关问题：spaceone.roomie@gmail.com</text>
+        <text class="section-text">活动相关问题：请联系活动组织者</text>
+      </view>
+
+      <view class="footer">
+        <text class="footer-text">生效日期：2026年3月5日</text>
+      </view>
+    </view>
+
+    <!-- 隐私政策 -->
+    <view wx:if="{{type === 'privacy'}}">
+      <view class="important-notice">
+        <text class="notice-title">【重要提示】</text>
+        <text class="notice-item">1. 信息收集：我们收集您的姓名、微信号、性别、入住日期、生活习惯等信息</text>
+        <text class="notice-item">2. 信息使用：仅用于匹配算法和向匹配对象展示</text>
+        <text class="notice-item">3. 信息共享：匹配成功后，您的信息将对匹配对象可见</text>
+        <text class="notice-item">4. 信息存储：存储在安全服务器，不会出售或泄露给无关第三方</text>
+        <text class="notice-item">5. 您的权利：可随时查看、更新、删除您的信息</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">一、我们收集的信息</text>
+        <text class="section-text">必要信息：微信 OpenID、姓名/昵称、微信号、性别、入住和退房日期、吸烟习惯、作息时间偏好、睡眠习惯、活动口令。</text>
+        <text class="section-text">自动收集：提交时间、匹配状态、匹配历史记录。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">二、信息使用目的</text>
+        <text class="section-text">提供核心服务：运行匹配算法、向匹配对象展示您的信息、记录匹配历史避免重复匹配。</text>
+        <text class="section-text">改进服务：统计匹配成功率、优化匹配算法。</text>
+        <text class="section-text">安全保障：防止恶意使用、处理用户投诉。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">三、信息共享</text>
+        <text class="section-text">与匹配对象共享：匹配成功后，您的姓名、微信号、入住日期、生活习惯将展示给匹配对象。</text>
+        <text class="section-text">我们不会与其他第三方共享您的个人信息，除非获得您的明确同意或根据法律法规要求。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">四、信息存储和保护</text>
+        <text class="section-text">存储地点：中华人民共和国境内的服务器。</text>
+        <text class="section-text">安全措施：数据加密传输（HTTPS）、服务器访问权限控制、定期安全审计。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">五、您的权利</text>
+        <text class="section-text">访问权：您可以在小程序内查看您提交的信息和匹配状态。</text>
+        <text class="section-text">更正权：您可以重新提交信息来更新您的个人信息。</text>
+        <text class="section-text">删除权：您可以联系我们申请删除您的个人信息。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">六、未成年人保护</text>
+        <text class="section-text">如您为未满18周岁的未成年人，请在监护人的陪同下阅读本政策，并在监护人同意后使用我们的服务。</text>
+      </view>
+
+      <view class="section">
+        <text class="section-title">七、联系我们</text>
+        <text class="section-text">邮箱：spaceone.roomie@gmail.com</text>
+        <text class="section-text">我们将在15个工作日内回复您的请求。</text>
+      </view>
+
+      <view class="footer">
+        <text class="footer-text">生效日期：2026年3月5日</text>
+        <text class="footer-text">更新日期：2026年3月5日</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>

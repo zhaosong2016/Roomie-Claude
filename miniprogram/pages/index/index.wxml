@@ -1,0 +1,57 @@
+<!-- pages/index/index.wxml -->
+<view class="page-wrapper">
+  <!-- 背景图片 -->
+  <image class="bg-image" src="/images/logo.png" mode="aspectFill"></image>
+
+  <!-- 内容层 -->
+  <view class="content-layer">
+    <!-- 标题区域 -->
+    <view class="header-section">
+      <view class="glass-card">
+        <text class="main-title">Space One 拼房实验室</text>
+        <text class="sub-title">智能匹配，找到好室友</text>
+      </view>
+    </view>
+
+    <!-- 统计数据区域 -->
+    <view class="stats-area" wx:if="{{!showCodeInput}}">
+      <view class="info-card">
+        <view class="big-number">{{totalUsers}}</view>
+        <view class="desc-text">位用户累计加入</view>
+      </view>
+    </view>
+
+    <!-- 主按钮或输入口令 -->
+    <view class="footer-btn" wx:if="{{!showCodeInput}}">
+      <button class="main-btn" bindtap="onStartMatch">我要拼房</button>
+    </view>
+
+    <!-- 输入口令区域 -->
+    <view class="code-input-section" wx:if="{{showCodeInput}}">
+      <view class="input-label">🔑 输入活动口令</view>
+      <input
+        class="code-input"
+        type="text"
+        placeholder="请输入口令"
+        value="{{groupCode}}"
+        bindinput="onCodeInput"
+        maxlength="20"
+        adjust-position="{{true}}"
+        confirm-type="done"
+      />
+      <view class="input-hint">不知道活动口令？请联系活动组织者</view>
+
+      <button
+        class="submit-btn"
+        bindtap="onSubmitCode"
+        disabled="{{!groupCode}}">
+        进入拼房
+      </button>
+    </view>
+
+    <!-- 组织者入口 -->
+    <view class="organizer-link" bindtap="goToCreate">
+      如果你是活动组织者，点击这里创建活动口令
+    </view>
+  </view>
+</view>

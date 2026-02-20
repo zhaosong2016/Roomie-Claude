@@ -1,0 +1,38 @@
+<!-- pages/create/create.wxml -->
+<view class="container">
+  <view class="title">创建活动</view>
+
+  <view class="form-section">
+    <text class="label">活动名称</text>
+    <input class="input" placeholder="例如：AI Summit" bindinput="onEventNameInput" value="{{event_name}}" />
+  </view>
+
+  <view class="form-section">
+    <text class="label">城市</text>
+    <input class="input" placeholder="例如：Beijing" bindinput="onCityInput" value="{{city}}" />
+  </view>
+
+  <view class="form-section">
+    <text class="label">活动开始日期</text>
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="picker">{{date || '请选择日期'}}</view>
+    </picker>
+  </view>
+
+  <view class="form-section">
+    <text class="label">自定义后缀（可选）</text>
+    <input class="input" placeholder="例如：A1" bindinput="onSuffixInput" value="{{custom_suffix}}" maxlength="10" />
+    <text class="hint">用于区分同一活动的不同批次</text>
+  </view>
+
+  <button class="submit-btn" bindtap="onCreate">生成口令</button>
+
+  <!-- 显示生成的口令 -->
+  <view class="result-section" wx:if="{{group_code}}">
+    <text class="result-title">✅ 口令生成成功</text>
+    <view class="code-display">{{group_code}}</view>
+    <text class="result-hint">请将此口令分享给参与者</text>
+    <button class="copy-btn" bindtap="onCopy">复制口令</button>
+    <button class="back-btn" bindtap="onBackHome">返回首页</button>
+  </view>
+</view>

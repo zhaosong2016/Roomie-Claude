@@ -19,12 +19,12 @@ from match import find_match
 app = Flask(__name__)
 CORS(app)  # 允许跨域请求
 
-def generate_group_code(event_name: str, city: str, date: str) -> str:
+def generate_group_code(event_name: str, city: str, date: str, custom_suffix: str = "") -> str:
     """
     生成群口令
 
-    规则：会议名首字母 + 城市首字母 + 日期(MMDD)
-    例如：AI Summit + Beijing + 2026-03-28 → ASBJ0328
+    规则：会议名首字母 + 城市首字母 + 日期(MMDD) + 自定义后缀（可选）
+    例如：AI Summit + Beijing + 2026-03-28 + "A组" → ASBJ0328-A组
 
     如果首字母提取失败，使用哈希值
     """
@@ -49,6 +49,19 @@ def generate_group_code(event_name: str, city: str, date: str) -> str:
         if len(code) < 6:
             hash_suffix = hashlib.md5(f"{event_name}{city}{date}".encode()).hexdigest()[:2].upper()
             code += hash_suffix
+
+        # 添加自定义后缀（自动转大写，只允许英文和数字）
+        if custom_suffix and custom_suffix.strip():
+            suffix = custom_suffix.strip().upper()
+            # 验证只包含英文字母和数字
+            if not suffix.replace(' ', '').isalnum():
+                return jsonify({
+                    "success": False,
+                    "message": "自定义标识只能包含英文字母和数字"
+                }), 400
+            # 移除空格
+            suffix = suffix.replace(' ', '')
+            code = f"{code}-{suffix}"
 
         return code
     except Exception as e:
@@ -86,11 +99,13 @@ def create_activity():
                     "message": f"缺少必填字段: {field}"
                 }), 400
 
-        # 生成口令
+        # 生成口令（支持自定义后缀）
+        custom_suffix = data.get('custom_suffix', '')
         group_code = generate_group_code(
             data['event_name'],
             data['city'],
-            data['date']
+            data['date'],
+            custom_suffix
         )
 
         return jsonify({
@@ -208,6 +223,63 @@ def submit_form():
 
     except Exception as e:
         print(f"提交表单错误: {e}")
+        return jsonify({
+            "success": False,
+            "message": f"服务器错误: {str(e)}"
+        }), 500
+
+@app.route('/api/check_code', methods=['GET'])
+def check_code():
+    """
+    检查群口令接口
+
+    请求参数：
+    - group_code: 群口令
+
+    返回：
+    {
+        "success": true,
+        "exists": true,
+        "active_count": 5,
+        "matched_count": 12,
+        "message": "此口令下有用户"
+    }
+    """
+    try:
+        group_code = request.args.get('group_code')
+
+        if not group_code:
+            return jsonify({
+                "success": False,
+                "message": "缺少群口令参数"
+            }), 400
+
+        # 获取该口令下的统计数据
+        stats = get_stats(group_code)
+        active_count = stats.get('active_count', 0)
+
+        # 计算已匹配人数（需要查询数据）
+        from data import load_data
+        data = load_data()
+        matched_count = len([
+            u for u in data["users"]
+            if u.get("group_code") == group_code and u.get("status") == "matched"
+        ])
+
+        # 判断是否有用户
+        total_users = active_count + matched_count
+        exists = total_users > 0
+
+        return jsonify({
+            "success": True,
+            "exists": exists,
+            "active_count": active_count,
+            "matched_count": matched_count,
+            "message": "此口令下有用户" if exists else "此口令下暂无用户"
+        })
+
+    except Exception as e:
+        print(f"检查口令错误: {e}")
         return jsonify({
             "success": False,
             "message": f"服务器错误: {str(e)}"
