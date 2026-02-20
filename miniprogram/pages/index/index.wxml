@@ -56,7 +56,7 @@
 
     <!-- 许愿入口 -->
     <view class="wish-link" bindtap="goToWish">
-      💭 我有想法
+      💬 我有想法
     </view>
   </view>
 </view>

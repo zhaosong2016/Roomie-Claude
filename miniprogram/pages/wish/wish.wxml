@@ -1,12 +1,34 @@
 <!-- pages/wish/wish.wxml -->
 <view class="container">
   <view class="header">
-    <text class="title">💭 许愿区</text>
+    <text class="title">💬 我有想法</text>
     <text class="subtitle">告诉我们你的想法和建议</text>
   </view>
 
   <view class="form-section">
-    <text class="label">你的许愿 *</text>
+    <text class="label">类型 *</text>
+    <radio-group bindchange="onTypeChange">
+      <label class="type-item">
+        <radio value="suggestion" checked="{{type === 'suggestion'}}" />
+        <text class="type-text">💡 提建议</text>
+      </label>
+      <label class="type-item">
+        <radio value="issue" checked="{{type === 'issue'}}" />
+        <text class="type-text">🐛 反馈问题</text>
+      </label>
+      <label class="type-item">
+        <radio value="wish" checked="{{type === 'wish'}}" />
+        <text class="type-text">💭 许个愿</text>
+      </label>
+      <label class="type-item">
+        <radio value="praise" checked="{{type === 'praise'}}" />
+        <text class="type-text">👍 表扬一下</text>
+      </label>
+    </radio-group>
+  </view>
+
+  <view class="form-section">
+    <text class="label">内容 *</text>
     <textarea
       class="textarea"
       placeholder="想要什么新功能？遇到什么问题？都可以告诉我们..."
@@ -48,11 +70,11 @@
     </radio-group>
   </view>
 
-  <button class="submit-btn" bindtap="onSubmit" disabled="{{!content}}">
-    提交许愿
+  <button class="submit-btn" bindtap="onSubmit" disabled="{{!type || !content}}">
+    提交
   </button>
 
   <view class="tip">
-    <text class="tip-text">💡 你的每一个建议都很重要，我们会认真对待</text>
+    <text class="tip-text">💡 你的每一个想法都很重要，我们会认真对待</text>
   </view>
 </view>

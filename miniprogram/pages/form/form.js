@@ -36,7 +36,9 @@ Page({
   },
 
   onWechatInput(e) {
-    this.setData({ wechat_id: e.detail.value })
+    // 只允许英文、数字、下划线和短横线
+    const value = e.detail.value.replace(/[^a-zA-Z0-9_-]/g, '')
+    this.setData({ wechat_id: value })
   },
 
   onGenderChange(e) {
@@ -180,9 +182,10 @@ Page({
       success: (res) => {
         wx.hideLoading()
         if (res.statusCode === 200 && res.data) {
-          // 保存用户信息和当前微信号到全局
+          // 保存用户信息和当前微信号、群口令到全局
           app.globalData.userInfo = res.data
           app.globalData.userInfo.wechat_id = wechat_id
+          app.globalData.userInfo.group_code = group_code
           // 跳转到结果页
           wx.redirectTo({
             url: '/pages/result/result'

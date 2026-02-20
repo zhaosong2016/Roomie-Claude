@@ -174,7 +174,7 @@
 /* 许愿链接 */
 .wish-link {
   font-size: 28rpx;
-  color: #FF6B6B;
+  color: #333;
   text-decoration: underline;
   margin-bottom: 40rpx;
 }

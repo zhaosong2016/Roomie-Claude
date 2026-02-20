@@ -3,9 +3,16 @@ const app = getApp()
 
 Page({
   data: {
+    type: '',
     content: '',
     contact: '',
     isPublic: true
+  },
+
+  onTypeChange(e) {
+    this.setData({
+      type: e.detail.value
+    })
   },
 
   onContentInput(e) {
@@ -27,14 +34,42 @@ Page({
   },
 
   onSubmit() {
-    const { content, contact, isPublic } = this.data
+    const { type, content, contact, isPublic } = this.data
 
-    if (!content.trim()) {
+    if (!type) {
       wx.showToast({
-        title: '请输入许愿内容',
+        title: '请选择类型',
         icon: 'none'
       })
       return
+    }
+
+    if (!content.trim()) {
+      wx.showToast({
+        title: '请输入内容',
+        icon: 'none'
+      })
+      return
+    }
+
+    // 根据类型设置不同的成功提示
+    const successMessages = {
+      suggestion: {
+        title: '感谢你的建议！',
+        content: '我们会认真考虑'
+      },
+      issue: {
+        title: '感谢反馈！',
+        content: '我们会尽快处理'
+      },
+      wish: {
+        title: '许愿成功！',
+        content: '我们会努力实现 ✨'
+      },
+      praise: {
+        title: '谢谢你的鼓励！',
+        content: '这是我们前进的动力 ❤️'
+      }
     }
 
     wx.showLoading({ title: '提交中...' })
@@ -47,6 +82,7 @@ Page({
       },
       timeout: 10000,
       data: {
+        type: type,
         content: content.trim(),
         contact: contact.trim(),
         is_public: isPublic,
@@ -55,9 +91,10 @@ Page({
       success: (res) => {
         wx.hideLoading()
         if (res.statusCode === 200 && res.data && res.data.success) {
+          const message = successMessages[type] || successMessages.suggestion
           wx.showModal({
-            title: '许愿成功！',
-            content: '感谢你的建议，我们会认真对待每一个许愿 💫',
+            title: message.title,
+            content: message.content,
             showCancel: false,
             confirmText: '返回首页',
             success: () => {
@@ -75,7 +112,7 @@ Page({
       },
       fail: (err) => {
         wx.hideLoading()
-        console.error('提交许愿失败:', err)
+        console.error('提交失败:', err)
         wx.showToast({
           title: '网络连接失败，请检查网络后重试',
           icon: 'none',

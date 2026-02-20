@@ -10,6 +10,11 @@
       <text class="title" wx:if="{{!isAlreadyMatched}}">🎉 有一位潜在室友，快联系TA吧</text>
       <text class="title" wx:if="{{isAlreadyMatched}}">✅ 你已匹配过这位室友</text>
 
+      <!-- 倒计时提示 -->
+      <view wx:if="{{!isAlreadyMatched}}" class="countdown-tip">
+        ⏰ 请在 {{countdown}} 秒内选择，否则匹配将自动取消
+      </view>
+
       <!-- 日期不完全匹配提示 -->
       <view wx:if="{{dateMatchType === 'partial'}}" class="date-warning">
         <text class="warning-icon">⚠️</text>
@@ -51,12 +56,10 @@
         <text class="value">{{match.noise_out === 'silent' ? '安静' : (match.noise_out === 'loud' ? '偶有声响' : '声响较大')}}</text>
       </view>
 
-      <view class="button-group" wx:if="{{isAlreadyMatched}}">
-        <button class="secondary-btn" bindtap="onCopyWechat">去加微信</button>
+      <view class="button-group">
+        <button class="secondary-btn" bindtap="onCopyWechat">{{isAlreadyMatched ? '去加微信' : '复制微信号'}}</button>
         <button class="danger-btn" bindtap="onRematch">重新匹配</button>
       </view>
-
-      <button class="main-btn" wx:if="{{!isAlreadyMatched}}" bindtap="onCopyWechat">复制微信号</button>
     </view>
 
     <!-- 等待匹配 -->

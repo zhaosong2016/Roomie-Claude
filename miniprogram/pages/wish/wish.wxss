@@ -65,6 +65,7 @@
   border-radius: 12rpx;
   font-size: 28rpx;
   box-sizing: border-box;
+  min-height: 80rpx;
 }
 
 .radio-item {
@@ -74,6 +75,21 @@
   margin: 10rpx 0;
   background: #f8f8f8;
   border-radius: 12rpx;
+}
+
+.type-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  margin: 10rpx 0;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+}
+
+.type-text {
+  margin-left: 15rpx;
+  font-size: 28rpx;
+  color: #333;
 }
 
 .radio-content {
@@ -99,8 +115,8 @@
 .submit-btn {
   width: 100%;
   height: 90rpx;
-  background-color: #007aff;
-  color: white !important;
+  background-color: #007aff !important;
+  color: #ffffff !important;
   border-radius: 45rpx;
   font-size: 32rpx;
   font-weight: bold;
@@ -108,10 +124,19 @@
   align-items: center;
   justify-content: center;
   margin-top: 30rpx;
+  box-shadow: 0 15rpx 40rpx rgba(0, 122, 255, 0.4);
+  border: none;
+  line-height: 90rpx;
+}
+
+.submit-btn::after {
+  border: none;
 }
 
 .submit-btn[disabled] {
-  background-color: #cccccc;
+  background-color: #cccccc !important;
+  box-shadow: none;
+  color: #ffffff !important;
 }
 
 .tip {
