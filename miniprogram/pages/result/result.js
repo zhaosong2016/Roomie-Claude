@@ -133,5 +133,11 @@ Page({
     wx.redirectTo({
       url: '/pages/index/index'
     })
+  },
+
+  goToWish() {
+    wx.navigateTo({
+      url: '/pages/wish/wish'
+    })
   }
 })

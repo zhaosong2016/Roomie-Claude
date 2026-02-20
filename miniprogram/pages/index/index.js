@@ -161,5 +161,12 @@ Page({
     wx.navigateTo({
       url: '/pages/create/create'
     })
+  },
+
+  // 跳转到许愿页
+  goToWish() {
+    wx.navigateTo({
+      url: '/pages/wish/wish'
+    })
   }
 })

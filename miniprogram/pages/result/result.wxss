@@ -210,3 +210,13 @@
   line-height: 1.6;
   flex: 1;
 }
+
+/* 许愿链接 */
+.wish-link {
+  text-align: center;
+  font-size: 28rpx;
+  color: #FF6B6B;
+  text-decoration: underline;
+  margin-top: 30rpx;
+  padding-bottom: 40rpx;
+}

@@ -1,0 +1,58 @@
+<!-- pages/wish/wish.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">💭 许愿区</text>
+    <text class="subtitle">告诉我们你的想法和建议</text>
+  </view>
+
+  <view class="form-section">
+    <text class="label">你的许愿 *</text>
+    <textarea
+      class="textarea"
+      placeholder="想要什么新功能？遇到什么问题？都可以告诉我们..."
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="500"
+      show-confirm-bar="{{false}}"
+    />
+    <text class="char-count">{{content.length}}/500</text>
+  </view>
+
+  <view class="form-section">
+    <text class="label">联系方式（可选）</text>
+    <input
+      class="input"
+      placeholder="微信号或邮箱，方便我们回访"
+      value="{{contact}}"
+      bindinput="onContactInput"
+    />
+  </view>
+
+  <view class="form-section">
+    <text class="label">公开设置</text>
+    <radio-group bindchange="onPublicChange">
+      <label class="radio-item">
+        <radio value="public" checked="{{isPublic}}" />
+        <view class="radio-content">
+          <text class="radio-title">可以公开</text>
+          <text class="radio-desc">其他用户可以看到（匿名显示）</text>
+        </view>
+      </label>
+      <label class="radio-item">
+        <radio value="private" checked="{{!isPublic}}" />
+        <view class="radio-content">
+          <text class="radio-title">仅开发者可见</text>
+          <text class="radio-desc">只有我们能看到你的反馈</text>
+        </view>
+      </label>
+    </radio-group>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit" disabled="{{!content}}">
+    提交许愿
+  </button>
+
+  <view class="tip">
+    <text class="tip-text">💡 你的每一个建议都很重要，我们会认真对待</text>
+  </view>
+</view>

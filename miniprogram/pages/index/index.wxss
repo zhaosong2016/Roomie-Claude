@@ -168,5 +168,13 @@
   color: #007ACC;
   text-decoration: underline;
   margin-top: 40rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 许愿链接 */
+.wish-link {
+  font-size: 28rpx;
+  color: #FF6B6B;
+  text-decoration: underline;
   margin-bottom: 40rpx;
 }

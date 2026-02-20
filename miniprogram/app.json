@@ -4,7 +4,8 @@
     "pages/form/form",
     "pages/result/result",
     "pages/create/create",
-    "pages/agreement/agreement"
+    "pages/agreement/agreement",
+    "pages/wish/wish"
   ],
   "window": {
     "backgroundTextStyle": "light",

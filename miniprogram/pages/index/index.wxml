@@ -53,5 +53,10 @@
     <view class="organizer-link" bindtap="goToCreate">
       如果你是活动组织者，点击这里创建活动口令
     </view>
+
+    <!-- 许愿入口 -->
+    <view class="wish-link" bindtap="goToWish">
+      💭 我有想法
+    </view>
   </view>
 </view>

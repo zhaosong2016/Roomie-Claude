@@ -97,5 +97,10 @@
     <view wx:if="{{!status}}" class="result-card">
       <text class="message">加载中...</text>
     </view>
+
+    <!-- 许愿入口 -->
+    <view class="wish-link" bindtap="goToWish">
+      💭 许个愿
+    </view>
   </view>
 </view>
