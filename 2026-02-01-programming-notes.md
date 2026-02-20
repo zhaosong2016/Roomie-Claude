@@ -387,6 +387,107 @@ ID编号: 258533809
   3. 选择"**纯文本**"（不是"富文本"）
   4. 保存文件时，文件名输入 `.py` 扩展名
 
+---
+
+## 🔄 每日工作流程（2026-02-20 确定）
+
+### 开工前准备
+1. 阅读 `2026-02-01-programming-notes.md`（协作规范和技术知识）
+2. 阅读 `PROJECT_STATUS.md`（项目进展和待办事项）
+
+### 开发循环（一天多次）
+
+```
+本地修改代码（前端 + 后端）
+  ↓
+scp 上传到服务器（只上传 api.py）
+  ↓
+服务器重启服务（bash deploy.sh）
+  ↓
+测试小程序
+  ↓
+发现问题 → 继续修改（回到第一步）
+```
+
+**具体命令：**
+
+```bash
+# 1. 本地修改完成后，上传到服务器
+cd "/Users/songsongsong/Library/Mobile Documents/com~apple~CloudDocs/同步盘/INNOVATION MAP/赵嵩项目/202601编程思维课/Roomie-Claude"
+scp api.py root@49.233.127.228:/root/Roomie-Claude/
+
+# 2. 在服务器上重启服务
+# （登录服务器后执行）
+cd /root/Roomie-Claude
+bash deploy.sh
+```
+
+### 晚上收工（一天一次）
+
+```bash
+# 在本地 Roomie-Claude 目录
+git add -A
+git commit -m "📝 2026-02-XX: 今天的工作总结"
+git push
+```
+
+### 重要说明
+
+#### 代码 vs 数据
+- **代码文件**（推 GitHub）：api.py、miniprogram/、*.md
+- **数据文件**（不推 GitHub）：room_data.json、wishes.json、*.log
+
+#### 为什么数据不推 GitHub？
+1. 数据一直在变（每次有人提交都会变）
+2. 数据只在服务器上有用（本地不需要）
+3. 数据可能很大（影响 Git 性能）
+
+#### 服务器上的 .gitignore 已配置
+```
+room_data.json
+wishes.json
+*.log
+```
+
+#### 只需本地推一次 GitHub
+- 服务器上的数据文件一直留在服务器
+- 定期用 `cp` 命令备份
+- 不需要推 GitHub
+
+### deploy.sh 脚本说明
+
+**位置**：`/root/Roomie-Claude/deploy.sh`
+
+**作用**：只负责重启服务，不负责更新代码
+
+**内容**：
+```bash
+#!/bin/bash
+echo "开始部署..."
+cd /root/Roomie-Claude
+pkill -f "python.*api.py"
+sleep 2
+nohup python3 api.py > api.log 2>&1 &
+sleep 2
+echo "部署完成！"
+ps aux | grep api.py | grep -v grep
+curl http://127.0.0.1:5000/api/health
+```
+
+### 常见问题
+
+**Q: 为什么不在服务器上 git pull？**
+A: GitHub 在国内访问不稳定，scp 上传更可靠。
+
+**Q: 测试时用的是哪里的代码？**
+A: 小程序（前端）在本地运行，但调用的是服务器上运行的 API（后端）。
+
+**Q: 每次修改都要 scp 上传吗？**
+A: 是的，后端代码必须在服务器上运行，小程序才能用。
+
+**Q: 一天要推几次 GitHub？**
+A: 只推一次，晚上所有工作完成后。避免一堆"修复bug"的提交。
+
   ### 如何验证是纯文本？
 
   在终端执行：
