@@ -1,0 +1,18 @@
+<view class="faq-container">
+  <view class="faq-header">
+    <text class="faq-title">你能用我做什么（FAQ）</text>
+  </view>
+
+  <view class="faq-list">
+    <view class="faq-item" wx:for="{{faqList}}" wx:key="id">
+      <view class="faq-question">
+        <text class="question-number">Q{{item.id}}</text>
+        <text class="question-text">{{item.question}}</text>
+      </view>
+
+      <view class="faq-answer">
+        <text class="answer-text">{{item.answer}}</text>
+      </view>
+    </view>
+  </view>
+</view>

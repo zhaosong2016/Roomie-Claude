@@ -54,6 +54,11 @@
       如果你是活动组织者，点击这里创建活动口令
     </view>
 
+    <!-- FAQ 入口 -->
+    <view class="faq-link" bindtap="goToFaq">
+      ❓ 我能用这个小程序做什么
+    </view>
+
     <!-- 许愿入口 -->
     <view class="wish-link" bindtap="goToWish">
       💬 我有想法

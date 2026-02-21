@@ -3,7 +3,32 @@
 ## 项目概述
 微信小程序：会议活动室友匹配系统
 
-## 最新状态（2026-02-20）
+## Claude 对话管理
+
+### 当前对话 Session ID
+```
+aadbbf29-4f91-447e-85eb-a917352a81dd
+```
+
+### 恢复对话命令
+```bash
+claude --resume aadbbf29-4f91-447e-85eb-a917352a81dd
+```
+
+### 查看所有对话列表
+```bash
+claude --list
+```
+会显示所有对话的 ID、时间和摘要
+
+### 在项目目录启动（自动恢复）
+```bash
+cd "/Users/songsongsong/Library/Mobile Documents/com~apple~CloudDocs/同步盘/INNOVATION MAP/赵嵩项目/202601编程思维课/Roomie-Claude"
+claude
+```
+如果之前在这个目录有对话，会自动恢复
+
+## 最新状态（2026-02-21）
 
 ### 已完成功能
 
@@ -59,7 +84,13 @@
 - ✅ 口令规则：会议名+城市+日期+自定义后缀
 - ✅ 口令验证（显示等待/已匹配人数）
 
-#### 8. 开发环境
+#### 8. FAQ 页面（2026-02-21 新增）
+- ✅ FAQ 页面开发（8 个常见问题）
+- ✅ 全展开设计，所有内容一次性显示
+- ✅ 首页添加 FAQ 入口
+- ✅ 紫色渐变背景，白色卡片设计
+
+#### 9. 开发环境
 - ✅ SSH密钥免密登录（本地→服务器）
 - ✅ 服务器API部署（49.233.127.228:5000）
 - ✅ 数据持久化（room_data.json）
@@ -69,7 +100,7 @@
 
 #### 前端（微信小程序）
 - 原生开发（WXML + WXSS + JS）
-- 页面：index（首页）、create（创建活动）、form（填表）、result（结果）
+- 页面：index（首页）、create（创建活动）、form（填表）、result（结果）、agreement（协议）、wish（许愿）、faq（常见问题）
 - AppID: wxff98b80705277ab6
 
 #### 后端（Flask API）
@@ -159,6 +190,75 @@
   - 添加 onWechatInput 过滤非法字符
   - 修复 group_code 保存到 globalData
 
+### 2026-02-21 更新内容
+
+#### 新增功能
+1. **FAQ 页面**
+   - 创建完整的 FAQ 页面（faq.wxml, faq.wxss, faq.js, faq.json）
+   - 包含 8 个常见问题（功能介绍、匹配规则、安全性、活动口令等）
+   - 全展开设计，所有内容一次性显示，无需点击
+   - 紫色渐变背景，白色卡片设计
+   - 首页添加 FAQ 入口："❓ 我能用这个小程序做什么"
+
+2. **批量测试脚本**
+   - 创建 `test_pending_mechanism.py` 批量测试脚本
+   - 测试 6 个场景：pending 创建、确认匹配、拒绝匹配、history 防重复、批量匹配、并发确认
+   - 自动化测试 pending 机制的完整流程
+
+3. **真机测试准备**
+   - 创建《真机测试用户清单.md》，包含 10 个测试用户
+   - 创建配套测试脚本：`create_real_test_users.py`、`check_test_status.py`、`clean_test_data.py`
+   - 完成真机测试，验证所有核心功能
+
+4. **开发工作流优化**
+   - 在 `2026-02-01-programming-notes.md` 中添加终端快捷键文档
+   - 记录删除操作、光标移动、历史命令等快捷键
+   - 建立"复杂命令写成文件"的工作流规范
+
+#### 优化改进
+1. **统计接口优化**
+   - 修改 `api.py` 的 `/api/check_code` 接口
+   - 增加 `pending_count` 统计
+   - 从 2 个状态统计（active, matched）改为 3 个（active, pending, matched）
+
+2. **创建活动页面优化**
+   - 修改 `create.wxml` 的 placeholder 示例
+   - 活动名称改为中文示例："人工智能峰会"
+   - 城市改为中英文都可："北京 或 Beijing"
+   - 自定义后缀注释改为："用于区分同一活动的不同群组"
+
+#### 修改的文件
+- `api.py`
+  - 修改 /api/check_code 接口，增加 pending_count 统计
+
+- `miniprogram/pages/faq/` (新增)
+  - `faq.wxml` - FAQ 页面结构
+  - `faq.wxss` - FAQ 页面样式
+  - `faq.js` - FAQ 页面逻辑（8 个问题）
+  - `faq.json` - FAQ 页面配置
+
+- `miniprogram/pages/index/`
+  - `index.wxml` - 添加 FAQ 入口链接
+  - `index.wxss` - 添加 FAQ 链接样式
+  - `index.js` - 添加 goToFaq 导航函数
+
+- `miniprogram/app.json`
+  - 注册 FAQ 页面
+
+- `miniprogram/pages/create/create.wxml`
+  - 优化 placeholder 和 hint 文案
+
+- `2026-02-01-programming-notes.md`
+  - 添加终端快捷键文档
+  - 添加命令执行最佳实践
+
+- 测试脚本（新增）
+  - `test_pending_mechanism.py` - 批量测试脚本
+  - `create_real_test_users.py` - 创建测试用户
+  - `check_test_status.py` - 检查用户状态
+  - `clean_test_data.py` - 清理测试数据
+  - `真机测试用户清单.md` - 测试用户列表
+
 ### 下一步计划
 
 #### 待操作清单
@@ -224,5 +324,5 @@
 
 ---
 
-**最后更新**: 2026-02-20
-**状态**: Pending 机制开发完成并测试通过，待部署上线
+**最后更新**: 2026-02-21
+**状态**: FAQ 页面开发完成，批量测试和真机测试通过，待同步服务器并推送 Git

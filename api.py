@@ -682,14 +682,16 @@ def check_code():
 
         # 统计等待匹配和已匹配的用户数
         active_count = len([u for u in group_users if u["status"] == "active"])
+        pending_count = len([u for u in group_users if u["status"] == "pending"])
         matched_count = len([u for u in group_users if u["status"] == "matched"])
 
         return jsonify({
             "success": True,
             "exists": True,
             "active_count": active_count,
+            "pending_count": pending_count,
             "matched_count": matched_count,
-            "message": f"此口令下有{active_count}位用户等待匹配，{matched_count}位已匹配"
+            "message": f"此口令下有{active_count}位用户等待匹配，{pending_count}位待确认，{matched_count}位已匹配"
         })
 
     except Exception as e:

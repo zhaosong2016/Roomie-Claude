@@ -168,5 +168,11 @@ Page({
     wx.navigateTo({
       url: '/pages/wish/wish'
     })
+  },
+
+  goToFaq() {
+    wx.navigateTo({
+      url: '/pages/faq/faq'
+    })
   }
 })

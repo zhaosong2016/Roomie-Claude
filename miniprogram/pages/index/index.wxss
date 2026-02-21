@@ -171,6 +171,14 @@
   margin-bottom: 20rpx;
 }
 
+/* FAQ 链接 */
+.faq-link {
+  font-size: 28rpx;
+  color: #333;
+  text-decoration: underline;
+  margin-bottom: 20rpx;
+}
+
 /* 许愿链接 */
 .wish-link {
   font-size: 28rpx;

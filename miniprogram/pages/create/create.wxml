@@ -4,12 +4,12 @@
 
   <view class="form-section">
     <text class="label">活动名称</text>
-    <input class="input" placeholder="例如：AI Summit" bindinput="onEventNameInput" value="{{event_name}}" />
+    <input class="input" placeholder="例如：人工智能峰会" bindinput="onEventNameInput" value="{{event_name}}" />
   </view>
 
   <view class="form-section">
     <text class="label">城市</text>
-    <input class="input" placeholder="例如：Beijing" bindinput="onCityInput" value="{{city}}" />
+    <input class="input" placeholder="例如：北京 或 Beijing" bindinput="onCityInput" value="{{city}}" />
   </view>
 
   <view class="form-section">
@@ -22,7 +22,7 @@
   <view class="form-section">
     <text class="label">自定义后缀（可选）</text>
     <input class="input" placeholder="例如：A1" bindinput="onSuffixInput" value="{{custom_suffix}}" maxlength="10" />
-    <text class="hint">用于区分同一活动的不同批次</text>
+    <text class="hint">用于区分同一活动的不同群组</text>
   </view>
 
   <button class="submit-btn" bindtap="onCreate">生成口令</button>
