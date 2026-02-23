@@ -1,7 +1,7 @@
 <!-- pages/result/result.wxml -->
 <view class="page-wrapper">
   <!-- 背景图片 -->
-  <image class="bg-image" src="/images/logo.png" mode="aspectFill"></image>
+  <image class="bg-image" src="/images/logo.jpg" mode="aspectFill"></image>
 
   <!-- 内容层 -->
   <view class="content-layer">

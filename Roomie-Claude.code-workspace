@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Pi"
+		},
+		{
+			"path": "../news-pusher"
+		}
+	],
+	"settings": {}
+}
