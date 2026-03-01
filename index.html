@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Space One 拼房实验室</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 480px;
+      margin: 20px auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo h1 { font-size: 22px; font-weight: 700; color: #333; }
+    .logo p { font-size: 14px; color: #888; margin-top: 4px; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="date"], select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #333;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus { border-color: #764ba2; }
+
+    .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .radio-option { flex: 1; min-width: 80px; }
+    .radio-option input[type="radio"] { display: none; }
+    .radio-option label {
+      display: block;
+      text-align: center;
+      padding: 10px 8px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      transition: all 0.2s;
+    }
+    .radio-option input[type="radio"]:checked + label {
+      border-color: #764ba2;
+      background: #f3f0ff;
+      color: #764ba2;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #f5f5f5; color: #555; }
+    .btn-danger { background: #fff0f0; color: #e53e3e; border: 1.5px solid #fcc; }
+
+    .hint { font-size: 12px; color: #aaa; margin-top: 5px; }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+    .alert-error { background: #fff0f0; color: #c53030; border: 1px solid #fcc; }
+    .alert-success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+
+    .result-card {
+      background: #f8f6ff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .result-card h3 { font-size: 18px; color: #333; margin-bottom: 14px; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #ede9ff;
+      font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .key { color: #888; }
+    .info-row .val { color: #333; font-weight: 500; }
+
+    .countdown-tip {
+      background: #fffbeb;
+      border: 1px solid #f6d860;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #856404;
+      margin-bottom: 14px;
+    }
+
+    .waiting-card {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .waiting-card .icon { font-size: 48px; margin-bottom: 12px; }
+    .waiting-card h3 { font-size: 18px; color: #333; margin-bottom: 8px; }
+    .waiting-card p { font-size: 14px; color: #888; }
+
+    .footer-links {
+      text-align: center;
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    .link-btn {
+      background: none;
+      border: none;
+      color: #764ba2;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .code-display {
+      background: #f3f0ff;
+      border: 2px dashed #764ba2;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #764ba2;
+      letter-spacing: 3px;
+      margin: 16px 0;
+    }
+
+    .faq-item {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 6px; }
+    .faq-a { font-size: 14px; color: #666; line-height: 1.6; }
+
+    /* 日期范围选择器 */
+    .date-picker-display {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+    }
+    .date-picker-display:active { border-color: #764ba2; }
+    .date-picker-display .date-val { flex: 1; text-align: center; }
+    .date-picker-display .date-sep { color: #aaa; }
+    .date-picker-display .date-placeholder { color: #aaa; }
+
+    .calendar-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .calendar-modal.open { display: flex; }
+
+    .calendar-panel {
+      background: white;
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .calendar-header .cal-title { font-size: 16px; font-weight: 600; color: #333; }
+    .calendar-header button {
+      background: none; border: none; font-size: 20px; cursor: pointer; color: #764ba2; padding: 4px 10px;
+    }
+
+    .calendar-hint {
+      text-align: center;
+      font-size: 13px;
+      color: #764ba2;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 8px;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: #333;
+    }
+    .cal-day.empty { cursor: default; }
+    .cal-day.past { color: #ddd; cursor: not-allowed; }
+    .cal-day.selected { background: #764ba2; color: white; }
+    .cal-day.in-range { background: #ddd6fe; color: #4c1d95; border-radius: 0; }
+    .cal-day.range-start { background: #764ba2; color: white; border-radius: 50% 0 0 50%; }
+    .cal-day.range-end { background: #764ba2; color: white; border-radius: 0 50% 50% 0; }
+    .cal-day:not(.past):not(.empty):hover { background: #ede9ff; }
+    .cal-day.selected:hover, .cal-day.range-start:hover, .cal-day.range-end:hover { background: #764ba2; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <h1>🏠 Space One 拼房实验室</h1>
+    <p>智能匹配，找到好室友</p>
+  </div>
+
+  <!-- 首页 -->
+  <div id="page-home" class="page active">
+    <div class="form-group">
+      <label>活动口令</label>
+      <input type="text" id="home-code" placeholder="请输入活动口令" />
+      <div class="hint">不知道口令？请联系活动组织者</div>
+    </div>
+    <div id="home-error" class="alert alert-error" style="display:none"></div>
+    <button class="btn btn-primary" onclick="submitCode()">进入拼房</button>
+    <div class="footer-links">
+      <button class="link-btn" onclick="showPage('page-create')">我是组织者，创建口令</button>
+      <button class="link-btn" onclick="showPage('page-faq')">这是什么？</button>
+    </div>
+  </div>
+
+  <!-- 填写信息 -->
+  <div id="page-form" class="page">
+    <div class="section-title">填写信息</div>
+    <div class="form-group">
+      <label>姓名</label>
+      <input type="text" id="f-name" placeholder="你的姓名" />
+    </div>
+    <div class="form-group">
+      <label>微信号</label>
+      <input type="text" id="f-wechat" placeholder="方便匹配后联系" oninput="filterWechat(this)" />
+    </div>
+    <div class="form-group">
+      <label>性别</label>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="gender" id="g-male" value="male">
+          <label for="g-male">男</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="gender" id="g-female" value="female">
+          <label for="g-female">女</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>入住 / 退房日期</label>
+      <div class="date-picker-display" onclick="openCalendar()">
+        <span class="date-val" id="display-checkin"><span class="date-placeholder">入住日期</span></span>
+        <span class="date-sep">→</span>
+        <span class="date-val" id="display-checkout"><span class="date-placeholder">退房日期</span></span>
+      </div>
+      <div id="nights-hint" class="hint" style="display:none;color:#764ba2;font-weight:500"></div>
+    </div>
+
+    <!-- 日历弹窗 -->
+    <div class="calendar-modal" id="calendar-modal" onclick="closeCalendarOutside(event)">
+      <div class="calendar-panel">
+        <div class="calendar-header">
+          <button onclick="prevMonth()">‹</button>
+          <span class="cal-title" id="cal-title"></span>
+          <button onclick="nextMonth()">›</button>
+        </div>
+        <div class="calendar-hint" id="cal-hint">请选择入住日期</div>
+        <div class="calendar-weekdays">
+          <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+        </div>
+        <div class="calendar-days" id="cal-days"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>吸烟习惯</label>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="smoking" id="s-no" value="no">
+          <label for="s-no">不吸烟</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="smoking" id="s-yes" value="yes">
+          <label for="s-yes">吸烟</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>作息倾向</label>
+      <div class="radio-group" style="flex-direction:column">
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="schedule" id="sc-early" value="early_bird">
+          <label for="sc-early">[早睡鸟] 习惯早睡早起，生物钟稳定</label>
+        </div>
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="schedule" id="sc-night" value="night_owl">
+          <label for="sc-night">[夜猫子] 越晚越精神，深夜才是自由时间</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>抗噪等级</label>
+      <div class="radio-group" style="flex-direction:column">
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="noise_in" id="ni-weak" value="weak">
+          <label for="ni-weak">[神经衰弱] 有动静就醒</label>
+        </div>
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="noise_in" id="ni-medium" value="medium">
+          <label for="ni-medium">[普通玩家] 正常翻身没问题</label>
+        </div>
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="noise_in" id="ni-strong" value="strong">
+          <label for="ni-strong">[雷打不动] 倒头就睡，浑然不觉</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>出声分贝</label>
+      <div class="radio-group" style="flex-direction:column">
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="noise_out" id="no-silent" value="silent">
+          <label for="no-silent">[寂静模式] 非常安静，基本无声</label>
+        </div>
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="noise_out" id="no-loud" value="loud">
+          <label for="no-loud">[混响模式] 偶尔翻身或磨牙</label>
+        </div>
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="noise_out" id="no-bass" value="bass">
+          <label for="no-bass">[低音炮模式] 呼噜明显哈哈</label>
+        </div>
+      </div>
+    </div>
+    <div id="form-error" class="alert alert-error" style="display:none"></div>
+    <button class="btn btn-primary" onclick="submitForm()">开始匹配</button>
+    <button class="btn btn-secondary" style="margin-top:10px" onclick="showPage('page-home')">返回</button>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="page-result" class="page">
+    <!-- 匹配成功 -->
+    <div id="result-matched" style="display:none">
+      <div class="result-card">
+        <h3>🎉 找到室友啦！</h3>
+        <div id="countdown-tip" class="countdown-tip" style="display:none">
+          ⏰ 请在 <span id="countdown-num">60</span> 秒内选择，否则匹配将自动取消
+        </div>
+        <div class="info-row"><span class="key">姓名</span><span class="val" id="r-name"></span></div>
+        <div class="info-row"><span class="key">微信号</span><span class="val" id="r-wechat"></span></div>
+        <div class="info-row"><span class="key">入住日期</span><span class="val" id="r-dates"></span></div>
+        <div class="info-row"><span class="key">吸烟习惯</span><span class="val" id="r-smoking"></span></div>
+        <div class="info-row"><span class="key">作息倾向</span><span class="val" id="r-schedule"></span></div>
+        <div class="info-row"><span class="key">噪音容忍度</span><span class="val" id="r-noise-in"></span></div>
+        <div class="info-row"><span class="key">睡眠声响</span><span class="val" id="r-noise-out"></span></div>
+      </div>
+      <button class="btn btn-primary" onclick="confirmMatch()">复制微信号并确认</button>
+      <button class="btn btn-danger" style="margin-top:10px" onclick="rejectMatch()">重新匹配</button>
+    </div>
+
+    <!-- 等待中 -->
+    <div id="result-waiting" style="display:none">
+      <div class="waiting-card">
+        <div class="icon">⏳</div>
+        <h3>等待匹配中</h3>
+        <p>已加入匹配池，等待其他用户加入</p>
+      </div>
+      <button class="btn btn-secondary" onclick="showPage('page-home')">返回首页</button>
+    </div>
+
+    <!-- 部分匹配 -->
+    <div id="result-partial" style="display:none">
+      <div class="result-card">
+        <h3>💡 发现潜在室友</h3>
+        <p style="font-size:14px;color:#666;margin-bottom:12px">有用户与你习惯匹配，但入住日期需调整</p>
+        <div id="partial-list"></div>
+      </div>
+      <p style="font-size:13px;color:#888;margin-bottom:12px">建议调整入住日期后重新提交</p>
+      <button class="btn btn-secondary" onclick="showPage('page-home')">返回首页</button>
+    </div>
+  </div>
+
+  <!-- 创建口令 -->
+  <div id="page-create" class="page">
+    <div class="section-title">创建活动口令</div>
+    <div class="form-group">
+      <label>活动名称</label>
+      <input type="text" id="c-name" placeholder="例如：人工智能峰会" />
+    </div>
+    <div class="form-group">
+      <label>城市</label>
+      <input type="text" id="c-city" placeholder="例如：北京 或 Beijing" />
+    </div>
+    <div class="form-group">
+      <label>活动开始日期</label>
+      <input type="date" id="c-date" />
+    </div>
+    <div class="form-group">
+      <label>自定义后缀（可选）</label>
+      <input type="text" id="c-suffix" placeholder="例如：A1" maxlength="10" />
+      <div class="hint">用于区分同一活动的不同群组</div>
+    </div>
+    <div id="create-error" class="alert alert-error" style="display:none"></div>
+    <div id="create-result" style="display:none">
+      <div class="alert alert-success">✅ 口令生成成功！</div>
+      <div class="code-display" id="created-code"></div>
+      <button class="btn btn-primary" onclick="copyCode()">复制口令</button>
+    </div>
+    <button class="btn btn-primary" id="create-btn" onclick="createActivity()" style="margin-top:8px">生成口令</button>
+    <button class="btn btn-secondary" style="margin-top:10px" onclick="showPage('page-home')">返回首页</button>
+  </div>
+
+  <!-- FAQ -->
+  <div id="page-faq" class="page">
+    <div class="section-title">❓ 常见问题</div>
+    <div class="faq-item">
+      <div class="faq-q">Q1. 你能用我做什么？</div>
+      <div class="faq-a">帮你在参加会议、活动时，找到合适的室友一起拼房，省钱又能休息好。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q2. 怎么开始？</div>
+      <div class="faq-a">向活动组织者索取活动口令，输入口令后填写你的入住信息，系统会自动帮你匹配。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q3. 匹配的标准是什么？</div>
+      <div class="faq-a">性别相同、入住日期一致、吸烟习惯一致、作息时间相近，以及睡眠习惯互相兼容。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q4. 匹配成功后怎么办？</div>
+      <div class="faq-a">系统会显示对方的姓名和微信号，你可以直接复制微信号去联系对方，商量订房细节。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q5. 如果不满意匹配结果怎么办？</div>
+      <div class="faq-a">可以选择"重新匹配"，系统会帮你重新寻找其他合适的室友。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q6. 我的信息安全吗？</div>
+      <div class="faq-a">你的信息只会在匹配成功后展示给对方，不会公开给其他人。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q7. 活动口令是什么？</div>
+      <div class="faq-a">活动口令是由组织者创建的专属代码，用于区分不同活动的参与者，确保你只会和同一活动的人匹配。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Q8. 我是活动组织者，怎么创建口令？</div>
+      <div class="faq-a">点击首页的"我是组织者，创建口令"，填写活动名称、城市和日期，系统会自动生成专属口令，分享给参与者即可。</div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="showPage('page-home')">返回首页</button>
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://49.233.127.228:5000';
+  let state = {
+    groupCode: '',
+    wechatId: '',
+    matchData: null,
+    isPending: false,
+    countdownTimer: null
+  };
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // 设置日期最小值为今天
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('c-date').min = today;
+
+  function filterWechat(input) {
+    input.value = input.value.replace(/[^a-zA-Z0-9_\-]/g, '');
+  }
+
+  // 日历组件
+  let calState = {
+    year: 0, month: 0,
+    checkin: null, checkout: null,
+    selecting: 'checkin'
+  };
+
+  function openCalendar() {
+    const now = new Date();
+    calState.year = now.getFullYear();
+    calState.month = now.getMonth();
+    calState.selecting = calState.checkin ? 'checkout' : 'checkin';
+    renderCalendar();
+    document.getElementById('calendar-modal').classList.add('open');
+  }
+
+  function closeCalendar() {
+    document.getElementById('calendar-modal').classList.remove('open');
+  }
+
+  function closeCalendarOutside(e) {
+    if (e.target === document.getElementById('calendar-modal')) closeCalendar();
+  }
+
+  function prevMonth() {
+    calState.month--;
+    if (calState.month < 0) { calState.month = 11; calState.year--; }
+    renderCalendar();
+  }
+
+  function nextMonth() {
+    calState.month++;
+    if (calState.month > 11) { calState.month = 0; calState.year++; }
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const { year, month, checkin, checkout, selecting } = calState;
+    const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    document.getElementById('cal-title').textContent = `${year}年 ${months[month]}`;
+    document.getElementById('cal-hint').textContent = selecting === 'checkin' ? '请选择入住日期' : '请选择退房日期';
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let html = '';
+    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isPast = date < today;
+      let cls = 'cal-day';
+      if (isPast) cls += ' past';
+      else if (checkin && checkout && dateStr > checkin && dateStr < checkout) cls += ' in-range';
+      else if (checkin && dateStr === checkin && checkout) cls += ' range-start';
+      else if (checkout && dateStr === checkout) cls += ' range-end';
+      else if (checkin && dateStr === checkin) cls += ' selected';
+      const click = isPast ? '' : `onclick="selectDate('${dateStr}')"`;
+      html += `<div class="${cls}" ${click}>${d}</div>`;
+    }
+    document.getElementById('cal-days').innerHTML = html;
+  }
+
+  function selectDate(dateStr) {
+    if (calState.selecting === 'checkin') {
+      calState.checkin = dateStr;
+      calState.checkout = null;
+      calState.selecting = 'checkout';
+      renderCalendar();
+    } else {
+      if (dateStr <= calState.checkin) {
+        calState.checkin = dateStr;
+        calState.checkout = null;
+        renderCalendar();
+        return;
+      }
+      calState.checkout = dateStr;
+      renderCalendar();
+      // 停顿 1 秒让用户看到选中效果再关闭
+      setTimeout(() => {
+        document.getElementById('display-checkin').textContent = calState.checkin;
+        document.getElementById('display-checkout').textContent = calState.checkout;
+        // 计算并显示入住天数
+        const nights = (new Date(calState.checkout) - new Date(calState.checkin)) / 86400000;
+        console.log('nights:', nights);
+        const hint = document.getElementById('nights-hint');
+        hint.textContent = `共 ${nights} 晚`;
+        hint.style.display = 'block';
+        closeCalendar();
+      }, 1000);
+    }
+  }
+
+  function getCheckin() { return calState.checkin || ''; }
+  function getCheckout() { return calState.checkout || ''; }
+
+  async function submitCode() {
+    const code = document.getElementById('home-code').value.trim().toUpperCase();
+    const errEl = document.getElementById('home-error');
+    errEl.style.display = 'none';
+    if (!code) { errEl.textContent = '请输入活动口令'; errEl.style.display = 'block'; return; }
+    try {
+      const res = await fetch(`${API}/api/check_code?group_code=${code}`);
+      const data = await res.json();
+      if (!data.success || !data.exists) {
+        errEl.textContent = '口令不存在，请检查后重试';
+        errEl.style.display = 'block';
+        return;
+      }
+      state.groupCode = code;
+      showPage('page-form');
+    } catch(e) {
+      errEl.textContent = '网络错误，请稍后重试';
+      errEl.style.display = 'block';
+    }
+  }
+
+  function getRadio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  }
+
+  async function submitForm() {
+    const name = document.getElementById('f-name').value.trim();
+    const wechat = document.getElementById('f-wechat').value.trim();
+    const checkin = getCheckin();
+    const checkout = getCheckout();
+    const gender = getRadio('gender');
+    const smoking = getRadio('smoking');
+    const schedule = getRadio('schedule');
+    const noise_in = getRadio('noise_in');
+    const noise_out = getRadio('noise_out');
+    const errEl = document.getElementById('form-error');
+    errEl.style.display = 'none';
+
+    if (!name || !wechat || !checkin || !checkout || !gender || !smoking || !schedule || !noise_in || !noise_out) {
+      errEl.textContent = '请填写所有信息';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    state.wechatId = wechat;
+    const groupCode = state.groupCode.toUpperCase();
+
+    try {
+      const res = await fetch(`${API}/api/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, wechat_id: wechat, group_code: groupCode, gender, check_in: checkin, check_out: checkout, smoking, schedule, noise_in, noise_out })
+      });
+      const data = await res.json();
+      showPage('page-result');
+      handleResult(data);
+    } catch(e) {
+      errEl.textContent = '网络错误，请稍后重试';
+      errEl.style.display = 'block';
+    }
+  }
+
+  function handleResult(data) {
+    document.getElementById('result-matched').style.display = 'none';
+    document.getElementById('result-waiting').style.display = 'none';
+    document.getElementById('result-partial').style.display = 'none';
+
+    if (data.matched && (data.match || data.match_info)) {
+      state.matchData = data.match || data.match_info;
+      state.isPending = data.is_pending || false;
+      const m = data.match || data.match_info;
+      document.getElementById('r-name').textContent = m.name;
+      document.getElementById('r-wechat').textContent = m.wechat_id;
+      document.getElementById('r-dates').textContent = `${m.check_in} 至 ${m.check_out}`;
+      document.getElementById('r-smoking').textContent = m.smoking === 'yes' ? '吸烟' : '不吸烟';
+      document.getElementById('r-schedule').textContent = m.schedule === 'early_bird' ? '早睡鸟' : '夜猫子';
+      document.getElementById('r-noise-in').textContent = m.noise_in === 'weak' ? '敏感' : (m.noise_in === 'medium' ? '普通' : '不敏感');
+      document.getElementById('r-noise-out').textContent = m.noise_out === 'silent' ? '安静' : (m.noise_out === 'loud' ? '偶有声响' : '声响较大');
+      document.getElementById('result-matched').style.display = 'block';
+
+      if (state.isPending) {
+        document.getElementById('countdown-tip').style.display = 'block';
+        startCountdown(60);
+      }
+    } else if (data.partial_matches && data.partial_matches.length > 0) {
+      const list = document.getElementById('partial-list');
+      list.innerHTML = data.partial_matches.map(p => `
+        <div style="padding:10px 0;border-bottom:1px solid #ede9ff;font-size:14px">
+          <div><strong>${p.name}</strong> (${p.wechat_id})</div>
+          <div style="color:#888;margin-top:4px">对方日期：${p.check_in} 至 ${p.check_out}</div>
+          <div style="color:#764ba2;margin-top:2px">可重叠：${p.overlap_start} 至 ${p.overlap_end}</div>
+        </div>`).join('');
+      document.getElementById('result-partial').style.display = 'block';
+    } else {
+      document.getElementById('result-waiting').style.display = 'block';
+    }
+  }
+
+  function startCountdown(seconds) {
+    let remaining = seconds;
+    document.getElementById('countdown-num').textContent = remaining;
+    state.countdownTimer = setInterval(() => {
+      remaining--;
+      document.getElementById('countdown-num').textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(state.countdownTimer);
+        rejectMatch();
+      }
+    }, 1000);
+  }
+
+  // 关闭/离开页面时自动 reject pending 状态
+  window.addEventListener('beforeunload', () => {
+    if (state.isPending && state.wechatId && state.groupCode) {
+      navigator.sendBeacon(`${API}/api/reject`, JSON.stringify({
+        wechat_id: state.wechatId,
+        group_code: state.groupCode
+      }));
+    }
+  });
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+
+  async function confirmMatch() {
+    if (state.countdownTimer) clearInterval(state.countdownTimer);
+    try {
+      await fetch(`${API}/api/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wechat_id: state.wechatId, group_code: state.groupCode })
+      });
+    } catch(e) {}
+    if (state.matchData) {
+      copyToClipboard(state.matchData.wechat_id);
+      alert(`微信号已复制：${state.matchData.wechat_id}`);
+    }
+  }
+
+  async function rejectMatch() {
+    if (state.countdownTimer) clearInterval(state.countdownTimer);
+    try {
+      await fetch(`${API}/api/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wechat_id: state.wechatId, group_code: state.groupCode })
+      });
+    } catch(e) {}
+    showPage('page-home');
+  }
+
+  async function createActivity() {
+    const name = document.getElementById('c-name').value.trim();
+    const city = document.getElementById('c-city').value.trim();
+    const date = document.getElementById('c-date').value;
+    const suffix = document.getElementById('c-suffix').value.trim();
+    const errEl = document.getElementById('create-error');
+    errEl.style.display = 'none';
+
+    if (!name || !city || !date) {
+      errEl.textContent = '请填写活动名称、城市和日期';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/create_activity`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_name: name, city, date, custom_suffix: suffix })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('created-code').textContent = data.group_code;
+        document.getElementById('create-result').style.display = 'block';
+        document.getElementById('create-btn').style.display = 'none';
+      } else {
+        errEl.textContent = data.message || '创建失败，请重试';
+        errEl.style.display = 'block';
+      }
+    } catch(e) {
+      errEl.textContent = '网络错误，请稍后重试';
+      errEl.style.display = 'block';
+    }
+  }
+
+  function copyCode() {
+    const code = document.getElementById('created-code').textContent;
+    copyToClipboard(code);
+    alert(`口令已复制：${code}`);
+  }
+</script>
+</body>
+</html>

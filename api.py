@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import json
 import time
@@ -137,6 +137,14 @@ def create_activity():
             return jsonify({"success": False, "message": "缺少必要参数"}), 400
 
         group_code = generate_group_code(event_name, city, date, custom_suffix)
+
+        # 保存口令，避免第一个用户进入时提示"口令不存在"
+        room_data = load_data()
+        if "activities" not in room_data:
+            room_data["activities"] = []
+        if group_code not in room_data["activities"]:
+            room_data["activities"].append(group_code)
+        save_data(room_data)
 
         return jsonify({
             "success": True,
@@ -676,8 +684,9 @@ def check_code():
         save_data(room_data)
 
         group_users = [u for u in room_data["users"] if u["group_code"] == group_code]
+        activities = room_data.get("activities", [])
 
-        if not group_users:
+        if not group_users and group_code not in activities:
             return jsonify({"success": False, "message": "群口令不存在，请检查后重试"}), 404
 
         # 统计等待匹配和已匹配的用户数
@@ -774,6 +783,12 @@ def check_match():
 def health_check():
     """健康检查"""
     return jsonify({"status": "ok", "timestamp": time.time()})
+
+
+@app.route('/', methods=['GET'])
+def index():
+    """网页版入口"""
+    return send_file('index.html')
 
 
 @app.route('/api/wish', methods=['POST'])
