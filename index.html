@@ -430,15 +430,24 @@
           ⏰ 请在 <span id="countdown-num">60</span> 秒内选择，否则匹配将自动取消
         </div>
         <div class="info-row"><span class="key">姓名</span><span class="val" id="r-name"></span></div>
-        <div class="info-row"><span class="key">微信号</span><span class="val" id="r-wechat"></span></div>
         <div class="info-row"><span class="key">入住日期</span><span class="val" id="r-dates"></span></div>
         <div class="info-row"><span class="key">吸烟习惯</span><span class="val" id="r-smoking"></span></div>
         <div class="info-row"><span class="key">作息倾向</span><span class="val" id="r-schedule"></span></div>
         <div class="info-row"><span class="key">噪音容忍度</span><span class="val" id="r-noise-in"></span></div>
         <div class="info-row"><span class="key">睡眠声响</span><span class="val" id="r-noise-out"></span></div>
       </div>
-      <button class="btn btn-primary" onclick="confirmMatch()">复制微信号并确认</button>
-      <button class="btn btn-danger" style="margin-top:10px" onclick="rejectMatch()">重新匹配</button>
+      <div id="match-actions">
+        <button class="btn btn-primary" onclick="confirmMatch()">确认匹配</button>
+        <button class="btn btn-danger" style="margin-top:10px" onclick="rejectMatch()">重新匹配</button>
+      </div>
+      <div id="match-confirmed" style="display:none">
+        <div class="result-card" style="background:#f0fff4;border:1px solid #9ae6b4;margin-top:12px">
+          <h3 style="color:#276749;margin-bottom:10px">✅ 匹配已确认！</h3>
+          <p style="font-size:13px;color:#555;margin-bottom:10px">对方微信号如下，长按可手动复制</p>
+          <input readonly id="r-wechat-confirmed" style="width:100%;border:1px solid #9ae6b4;border-radius:8px;padding:12px;font-size:18px;font-weight:bold;color:#276749;text-align:center;background:#fff;box-sizing:border-box;" />
+        </div>
+        <button class="btn btn-secondary" style="margin-top:10px" onclick="showPage('page-home')">返回首页</button>
+      </div>
     </div>
 
     <!-- 等待中 -->
@@ -728,7 +737,6 @@
       state.isPending = data.is_pending || false;
       const m = data.match || data.match_info;
       document.getElementById('r-name').textContent = m.name;
-      document.getElementById('r-wechat').textContent = m.wechat_id;
       document.getElementById('r-dates').textContent = `${m.check_in} 至 ${m.check_out}`;
       document.getElementById('r-smoking').textContent = m.smoking === 'yes' ? '吸烟' : '不吸烟';
       document.getElementById('r-schedule').textContent = m.schedule === 'early_bird' ? '早睡鸟' : '夜猫子';
@@ -736,7 +744,15 @@
       document.getElementById('r-noise-out').textContent = m.noise_out === 'silent' ? '安静' : (m.noise_out === 'loud' ? '偶有声响' : '声响较大');
       document.getElementById('result-matched').style.display = 'block';
 
-      if (state.isPending) {
+      if (!state.isPending) {
+        // 已经确认过的匹配，直接显示微信号
+        document.getElementById('r-wechat-confirmed').value = m.wechat_id;
+        document.getElementById('match-actions').style.display = 'none';
+        document.getElementById('match-confirmed').style.display = 'block';
+      } else {
+        // 新匹配，先不显示微信号，等确认后再显示
+        document.getElementById('match-actions').style.display = 'block';
+        document.getElementById('match-confirmed').style.display = 'none';
         document.getElementById('countdown-tip').style.display = 'block';
         startCountdown(60);
       }
@@ -786,14 +802,15 @@
   }
 
   function fallbackCopy(text) {
-    const el = document.createElement('textarea');
+    const el = document.createElement('input');
     el.value = text;
-    el.style.position = 'fixed';
-    el.style.opacity = '0';
+    el.setAttribute('readonly', '');
+    el.style.cssText = 'position:fixed;top:50%;left:0;width:100%;font-size:16px;opacity:0.01;';
     document.body.appendChild(el);
     el.focus();
     el.select();
-    document.execCommand('copy');
+    el.setSelectionRange(0, 99999);
+    try { document.execCommand('copy'); } catch(e) {}
     document.body.removeChild(el);
   }
 
@@ -807,8 +824,10 @@
       });
     } catch(e) {}
     if (state.matchData) {
-      copyToClipboard(state.matchData.wechat_id);
-      alert(`微信号已复制：${state.matchData.wechat_id}`);
+      document.getElementById('r-wechat-confirmed').value = state.matchData.wechat_id;
+      document.getElementById('match-actions').style.display = 'none';
+      document.getElementById('countdown-tip').style.display = 'none';
+      document.getElementById('match-confirmed').style.display = 'block';
     }
   }
 
