@@ -9,8 +9,24 @@ App({
 
   onLaunch() {
     console.log('小程序启动')
-    // 开发阶段暂时禁用微信登录，正式上线后取消注释
-    // this.doLogin()
+    this.doLogin()
+
+    // 微信隐私保护授权
+    wx.onNeedPrivacyAuthorization(resolve => {
+      wx.showModal({
+        title: '隐私保护提示',
+        content: '在使用前，请阅读《隐私政策》。我们会依据隐私政策收集和使用您的信息，用于为您提供拼房匹配服务。',
+        confirmText: '同意',
+        cancelText: '不同意',
+        success: (res) => {
+          if (res.confirm) {
+            resolve({ event: 'agree' })
+          } else {
+            resolve({ event: 'disagree' })
+          }
+        }
+      })
+    })
   },
 
   // 微信登录

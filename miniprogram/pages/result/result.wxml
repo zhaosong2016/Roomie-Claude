@@ -7,11 +7,11 @@
   <view class="content-layer">
     <!-- 匹配成功 -->
     <view wx:if="{{status === 'matched'}}" class="result-card">
-      <text class="title" wx:if="{{!isAlreadyMatched}}">🎉 有一位潜在室友，快联系TA吧</text>
-      <text class="title" wx:if="{{isAlreadyMatched}}">✅ 你已匹配过这位室友</text>
+      <text class="title" wx:if="{{!showMessage}}">🎉 有一位潜在室友，快联系TA吧</text>
+      <text class="title" wx:if="{{showMessage}}">✅ 匹配已确认</text>
 
       <!-- 倒计时提示 -->
-      <view wx:if="{{!isAlreadyMatched}}" class="countdown-tip">
+      <view wx:if="{{!showMessage}}" class="countdown-tip">
         ⏰ 请在 {{countdown}} 秒内选择，否则匹配将自动取消
       </view>
 
@@ -24,11 +24,6 @@
       <view class="info-item">
         <text class="label">对方姓名</text>
         <text class="value">{{match.name}}</text>
-      </view>
-
-      <view class="info-item">
-        <text class="label">微信号</text>
-        <text class="value">{{match.wechat_id}}</text>
       </view>
 
       <view class="info-item">
@@ -56,10 +51,18 @@
         <text class="value">{{match.noise_out === 'silent' ? '安静' : (match.noise_out === 'loud' ? '偶有声响' : '声响较大')}}</text>
       </view>
 
-      <view class="button-group">
-        <button class="secondary-btn" bindtap="onCopyWechat">{{isAlreadyMatched ? '去加微信' : '复制微信号'}}</button>
+      <!-- 确认后显示留言 -->
+      <view wx:if="{{showMessage}}" class="message-box">
+        <text class="message-label">TA给你的留言</text>
+        <text class="message-content" user-select="true">{{match.wechat_id}}</text>
+        <text class="message-hint">长按上方内容可手动复制</text>
+      </view>
+
+      <view class="button-group" wx:if="{{!showMessage}}">
+        <button class="secondary-btn" bindtap="onConfirmMatch">确认匹配</button>
         <button class="danger-btn" bindtap="onRematch">重新匹配</button>
       </view>
+      <button wx:if="{{showMessage}}" class="main-btn" bindtap="onBackHome">返回首页</button>
     </view>
 
     <!-- 等待匹配 -->
@@ -101,9 +104,5 @@
       <text class="message">加载中...</text>
     </view>
 
-    <!-- 许愿入口 -->
-    <view class="wish-link" bindtap="goToWish">
-      💭 许个愿
-    </view>
   </view>
 </view>

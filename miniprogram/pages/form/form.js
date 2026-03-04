@@ -36,9 +36,7 @@ Page({
   },
 
   onWechatInput(e) {
-    // 只允许英文、数字、下划线和短横线
-    const value = e.detail.value.replace(/[^a-zA-Z0-9_-]/g, '')
-    this.setData({ wechat_id: value })
+    this.setData({ wechat_id: e.detail.value })
   },
 
   onGenderChange(e) {
@@ -114,7 +112,7 @@ Page({
       return
     }
     if (!wechat_id) {
-      wx.showToast({ title: '请输入微信号', icon: 'none' })
+      wx.showToast({ title: '请填写联系方式', icon: 'none' })
       return
     }
     if (!gender) {
@@ -168,7 +166,7 @@ Page({
       data: {
         name,
         wechat_id,
-        openid: app.globalData.openid || '',  // 开发阶段可能为空
+        openid: app.globalData.openid || '',
         gender,
         check_in,
         check_out,

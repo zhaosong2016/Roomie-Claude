@@ -41,16 +41,6 @@
   </view>
 
   <view class="form-section">
-    <text class="label">联系方式（可选）</text>
-    <input
-      class="input"
-      placeholder="微信号或邮箱，方便我们回访"
-      value="{{contact}}"
-      bindinput="onContactInput"
-    />
-  </view>
-
-  <view class="form-section">
     <text class="label">公开设置</text>
     <radio-group bindchange="onPublicChange">
       <label class="radio-item">

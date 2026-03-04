@@ -8,11 +8,6 @@
   </view>
 
   <view class="form-section">
-    <text class="label">你的微信号</text>
-    <input class="input" type="text" placeholder="用于匹配成功后联系" bindinput="onWechatInput" value="{{wechat_id}}" />
-  </view>
-
-  <view class="form-section">
     <text class="label">你的性别</text>
     <radio-group bindchange="onGenderChange">
       <label><radio value="female" />女</label>
@@ -62,6 +57,11 @@
       <label class="radio-block"><radio value="loud" /> [混响模式] 偶尔翻身或磨牙</label>
       <label class="radio-block"><radio value="bass" /> [低音炮模式] 呼噜明显哈哈</label>
     </radio-group>
+  </view>
+
+  <view class="form-section">
+    <text class="label">如何联系你</text>
+    <input class="input" placeholder="" bindinput="onWechatInput" value="{{wechat_id}}" maxlength="100" />
   </view>
 
   <view class="form-section">

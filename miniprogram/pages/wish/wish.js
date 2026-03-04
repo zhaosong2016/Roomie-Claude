@@ -5,7 +5,6 @@ Page({
   data: {
     type: '',
     content: '',
-    contact: '',
     isPublic: true
   },
 
@@ -21,12 +20,6 @@ Page({
     })
   },
 
-  onContactInput(e) {
-    this.setData({
-      contact: e.detail.value
-    })
-  },
-
   onPublicChange(e) {
     this.setData({
       isPublic: e.detail.value === 'public'
@@ -34,7 +27,7 @@ Page({
   },
 
   onSubmit() {
-    const { type, content, contact, isPublic } = this.data
+    const { type, content, isPublic } = this.data
 
     if (!type) {
       wx.showToast({
@@ -84,7 +77,6 @@ Page({
       data: {
         type: type,
         content: content.trim(),
-        contact: contact.trim(),
         is_public: isPublic,
         openid: app.globalData.openid || ''
       },

@@ -1,6 +1,8 @@
 /* pages/form/form.wxss */
 .container {
   padding: 20px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .page-title {
@@ -31,11 +33,17 @@
 }
 
 .input {
-  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+  background: #fff;
+}
+
+.textarea-contact {
+  height: 80px;
+  line-height: 1.5;
+  box-sizing: border-box;
 }
 
 .picker {

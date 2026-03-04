@@ -5,7 +5,7 @@
     <view wx:if="{{type === 'user'}}">
       <view class="important-notice">
         <text class="notice-title">【重要提示】</text>
-        <text class="notice-item">1. 信息公开：匹配成功后，您的姓名、微信号、入住日期、生活习惯等信息将对匹配对象可见</text>
+        <text class="notice-item">1. 信息公开：匹配成功后，您的姓名、您留下的联系方式、入住日期、生活习惯等信息将对匹配对象可见</text>
         <text class="notice-item">2. 自担风险：本服务仅提供信息匹配，不对拼房结果、人身财产安全承担责任</text>
         <text class="notice-item">3. 真实信息：您应确保提交信息真实准确</text>
         <text class="notice-item">4. 解除匹配：您可随时解除匹配，但已交换的联系方式无法撤回</text>
@@ -28,7 +28,7 @@
 
       <view class="section">
         <text class="section-title">三、匹配规则</text>
-        <text class="section-text">3.1 匹配成功后，双方信息将互相可见，包括姓名、微信号、入住日期、生活习惯等。</text>
+        <text class="section-text">3.1 匹配成功后，双方信息将互相可见，包括姓名、您留下的联系方式、入住日期、生活习惯等。</text>
         <text class="section-text">3.2 您可以随时解除匹配，但已交换的联系方式无法撤回。</text>
         <text class="section-text">3.3 曾经匹配并解除的用户，系统将不再为您推荐该用户。</text>
       </view>
@@ -55,7 +55,7 @@
     <view wx:if="{{type === 'privacy'}}">
       <view class="important-notice">
         <text class="notice-title">【重要提示】</text>
-        <text class="notice-item">1. 信息收集：我们收集您的姓名、微信号、性别、入住日期、生活习惯等信息</text>
+        <text class="notice-item">1. 信息收集：我们收集您的姓名、您留下的联系方式、性别、入住日期、生活习惯等信息</text>
         <text class="notice-item">2. 信息使用：仅用于匹配算法和向匹配对象展示</text>
         <text class="notice-item">3. 信息共享：匹配成功后，您的信息将对匹配对象可见</text>
         <text class="notice-item">4. 信息存储：存储在安全服务器，不会出售或泄露给无关第三方</text>
@@ -64,7 +64,7 @@
 
       <view class="section">
         <text class="section-title">一、我们收集的信息</text>
-        <text class="section-text">必要信息：微信 OpenID、姓名/昵称、微信号、性别、入住和退房日期、吸烟习惯、作息时间偏好、睡眠习惯、活动口令。</text>
+        <text class="section-text">必要信息：姓名/昵称、您留下的联系方式、性别、入住和退房日期、吸烟习惯、作息时间偏好、睡眠习惯、活动口令。</text>
         <text class="section-text">自动收集：提交时间、匹配状态、匹配历史记录。</text>
       </view>
 
@@ -77,7 +77,7 @@
 
       <view class="section">
         <text class="section-title">三、信息共享</text>
-        <text class="section-text">与匹配对象共享：匹配成功后，您的姓名、微信号、入住日期、生活习惯将展示给匹配对象。</text>
+        <text class="section-text">与匹配对象共享：匹配成功后，您的姓名、您留下的联系方式、入住日期、生活习惯将展示给匹配对象。</text>
         <text class="section-text">我们不会与其他第三方共享您的个人信息，除非获得您的明确同意或根据法律法规要求。</text>
       </view>
 

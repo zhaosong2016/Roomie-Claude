@@ -3,13 +3,14 @@ const app = getApp()
 
 Page({
   data: {
-    status: '', // 'matched', 'waiting', 'partial', or 'already_matched'
+    status: '',
     match: null,
     partialMatches: [],
-    isAlreadyMatched: false,  // 是否是重复提交已匹配用户
-    dateMatchType: 'full',  // 日期匹配类型：'full' 或 'partial'
-    countdown: 60,  // 倒计时秒数
-    isPending: false  // 是否是 pending 状态（新匹配）
+    isAlreadyMatched: false,
+    dateMatchType: 'full',
+    countdown: 60,
+    isPending: false,
+    showMessage: false
   },
 
   countdownTimer: null,  // 倒计时定时器
@@ -35,7 +36,8 @@ Page({
         match: userInfo.match_info,
         isAlreadyMatched: isAlreadyMatched,
         dateMatchType: userInfo.date_match_type || 'full',
-        isPending: isPending
+        isPending: isPending,
+        showMessage: isAlreadyMatched  // 已匹配过的直接显示留言
       })
 
       // 如果是新匹配（pending 状态），启动倒计时
@@ -147,39 +149,20 @@ Page({
     })
   },
 
-  // 复制微信号并确认匹配
-  onCopyWechat() {
-    const { match, isAlreadyMatched } = this.data
-
-    // 如果是已经匹配过的，直接复制
-    if (isAlreadyMatched) {
-      wx.setClipboardData({
-        data: match.wechat_id,
-        success: () => {
-          wx.showToast({
-            title: '微信号已复制',
-            icon: 'success'
-          })
-        }
-      })
-      return
-    }
-
-    // 清除倒计时
+  // 确认匹配，显示留言
+  onConfirmMatch() {
     if (this.countdownTimer) {
       clearInterval(this.countdownTimer)
     }
+    this.setData({ isPending: false })
 
-    // 如果是新匹配，需要先确认匹配
     wx.showLoading({ title: '确认中...' })
 
     const userInfo = app.globalData.userInfo
     wx.request({
       url: `${app.globalData.apiUrl}/api/confirm`,
       method: 'POST',
-      header: {
-        'content-type': 'application/json'
-      },
+      header: { 'content-type': 'application/json' },
       data: {
         wechat_id: userInfo.wechat_id,
         group_code: userInfo.group_code,
@@ -188,21 +171,7 @@ Page({
       success: (res) => {
         wx.hideLoading()
         if (res.statusCode === 200 && res.data && res.data.success) {
-          // 确认成功，复制微信号
-          wx.setClipboardData({
-            data: match.wechat_id,
-            success: () => {
-              wx.showToast({
-                title: '微信号已复制',
-                icon: 'success'
-              })
-              // 更新状态为已匹配
-              this.setData({
-                isAlreadyMatched: true,
-                isPending: false
-              })
-            }
-          })
+          this.setData({ showMessage: true, isAlreadyMatched: true })
         } else {
           wx.showToast({
             title: res.data && res.data.message ? res.data.message : '确认失败',
@@ -210,13 +179,9 @@ Page({
           })
         }
       },
-      fail: (err) => {
+      fail: () => {
         wx.hideLoading()
-        console.error('确认匹配失败:', err)
-        wx.showToast({
-          title: '网络连接失败',
-          icon: 'none'
-        })
+        wx.showToast({ title: '网络连接失败', icon: 'none' })
       }
     })
   },
