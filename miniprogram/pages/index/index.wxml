@@ -58,10 +58,5 @@
     <view class="faq-link" bindtap="goToFaq">
       ❓ 我能用这个小程序做什么
     </view>
-
-    <!-- 许愿入口 -->
-    <view class="wish-link" bindtap="goToWish">
-      💬 我有想法
-    </view>
   </view>
 </view>

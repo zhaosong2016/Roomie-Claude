@@ -181,8 +181,7 @@ def wechat_login():
         if "openid" in result:
             return jsonify({
                 "success": True,
-                "openid": result["openid"],
-                "session_key": result.get("session_key", "")
+                "openid": result["openid"]
             })
         else:
             return jsonify({

@@ -363,3 +363,39 @@ claude
 
 **最后更新**: 2026-02-23
 **状态**: 代码已上传微信后台，包体积优化完成，等待备案通过后提交审核
+
+---
+
+### 2026-03-01 网页版上线
+- 网页版完整拼房流程上线
+- 小程序首次提交审核
+
+---
+
+### 2026-03-04 第二轮改版（应对第一次审核被拒）
+
+**被拒原因**：wechat_id 字段明确收集微信号，违反规则 3.4
+
+**改动内容**：
+- `form.wxml/js/wxss`：wechat_id 改为单行自由填写，标签"如何联系你"，无提示语，移至表单底部，去掉英文限制，白色背景，修复溢出问题
+- `result.wxml/js/wxss`：确认匹配后才显示对方留言（showMessage 机制），确认后只剩全宽"返回首页"，删除"许个愿"入口
+- `wish.wxml/js`：删除联系方式字段
+- `agreement.wxml`：所有"微信号"改为"您留下的联系方式"，删除"微信 OpenID"条目
+- `app.json`：添加 `usePrivacyCheck: true`
+- `app.js`：启用 `doLogin()`，添加 `wx.onNeedPrivacyAuthorization` 隐私弹窗
+- `form.wxss`：容器加 `overflow-x: hidden` 防左右晃动，input 加白色背景
+
+---
+
+### 2026-03-05 第三轮改版（应对第二次审核被拒）
+
+**被拒原因1**：`/api/login` 响应中明文传输 session_key
+- `api.py`：删除响应里的 `session_key` 字段，只返回 `openid`
+
+**被拒原因2**：许愿页属于用户反馈功能，个人主体不允许
+- `app.json`：删除 `pages/wish/wish` 页面注册
+- `index.wxml`：删除"我有想法"入口
+- `index.js`：删除 `goToWish()` 方法
+
+**最后更新**: 2026-03-05
+**状态**: 第三轮改版完成，准备再次提交审核

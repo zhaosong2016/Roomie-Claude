@@ -5,7 +5,6 @@
     "pages/result/result",
     "pages/create/create",
     "pages/agreement/agreement",
-    "pages/wish/wish",
     "pages/faq/faq"
   ],
   "window": {
