@@ -16,12 +16,12 @@
   </view>
 
   <view class="form-section">
-    <text class="label">打算住几晚</text>
+    <text class="label">计划待几天</text>
     <picker mode="date" value="{{check_in}}" start="{{today}}" bindchange="onCheckInChange">
-      <view class="picker">入住：{{check_in || '请选择日期'}}</view>
+      <view class="picker">抵达：{{check_in || '请选择日期'}}</view>
     </picker>
     <picker mode="date" value="{{check_out}}" start="{{today}}" bindchange="onCheckOutChange" style="margin-top:10px">
-      <view class="picker">退房：{{check_out || '请选择日期'}}</view>
+      <view class="picker">离开：{{check_out || '请选择日期'}}</view>
     </picker>
   </view>
 
