@@ -493,8 +493,8 @@
       <div class="hint">用于区分同一活动的不同群组</div>
     </div>
     <div style="background:#f0f9ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin:16px 0;font-size:13px;color:#1e40af;">
-      <div style="font-weight:600;margin-bottom:6px;">📋 为了更好地提供技术支持</div>
-      <div>请留下您的联系方式，我们会在必要时与您联系</div>
+      <div style="font-weight:600;margin-bottom:6px;">📋 请您留下联系方式</div>
+      <div>以便必要时联系您，为您提供技术支持</div>
     </div>
     <div class="form-group">
       <label>您的姓名</label>
@@ -505,12 +505,13 @@
       <input type="tel" id="c-contact-phone" placeholder="请输入手机号" maxlength="11" />
     </div>
     <div class="form-group">
-      <label>邮箱（选填）</label>
+      <label>邮箱</label>
       <input type="email" id="c-contact-email" placeholder="请输入邮箱地址" />
     </div>
     <div class="form-group">
       <label>活动备注（选填）</label>
       <input type="text" id="c-note" placeholder="例如：预计50人参加" />
+      <div class="hint">便于为您预留足够的服务器空间</div>
     </div>
     <div id="create-error" class="alert alert-error" style="display:none"></div>
     <div id="create-result" style="display:none">
@@ -889,6 +890,18 @@
 
     if (!/^1[3-9]\d{9}$/.test(contactPhone)) {
       errEl.textContent = '请输入正确的手机号';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    if (!contactEmail) {
+      errEl.textContent = '请填写邮箱地址';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+      errEl.textContent = '请输入正确的邮箱地址';
       errEl.style.display = 'block';
       return;
     }

@@ -181,6 +181,9 @@ def create_activity():
         if not contact_name or not contact_phone:
             return jsonify({"success": False, "message": "请填写联系方式"}), 400
 
+        if not contact_email:
+            return jsonify({"success": False, "message": "请填写邮箱地址"}), 400
+
         group_code = generate_group_code(event_name, city, date, custom_suffix)
 
         # 保存口令和联系信息
