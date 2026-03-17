@@ -5,6 +5,9 @@ import time
 import hashlib
 import requests
 import fcntl
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from pypinyin import lazy_pinyin, Style
 
@@ -17,6 +20,41 @@ WISH_FILE = "wishes.json"
 # 微信小程序配置
 WECHAT_APPID = "wxff98b80705277ab6"
 WECHAT_SECRET = "f251b2106c7655ab8b5bc7cfd5d5190e"
+
+# 邮件推送配置
+EMAIL_CONFIG = {
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "sender_email": "spaceone.roomie@gmail.com",
+    "sender_password": "",  # 需要填入Gmail应用专用密码
+    "receiver_email": "spaceone.roomie@gmail.com",
+    "enabled": False  # 获取密码后改为True
+}
+
+
+def send_email_notification(subject, body):
+    """发送邮件通知"""
+    if not EMAIL_CONFIG["enabled"] or not EMAIL_CONFIG["sender_password"]:
+        return False
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_CONFIG["sender_email"]
+        msg['To'] = EMAIL_CONFIG["receiver_email"]
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+
+        server = smtplib.SMTP(EMAIL_CONFIG["smtp_server"], EMAIL_CONFIG["smtp_port"])
+        server.starttls()
+        server.login(EMAIL_CONFIG["sender_email"], EMAIL_CONFIG["sender_password"])
+        server.send_message(msg)
+        server.quit()
+
+        return True
+    except Exception as e:
+        print(f"邮件发送失败: {e}")
+        return False
 
 
 def load_data():
@@ -132,19 +170,64 @@ def create_activity():
         city = data.get('city', '')
         date = data.get('date', '')
         custom_suffix = data.get('custom_suffix', '')
+        contact_name = data.get('contact_name', '')
+        contact_phone = data.get('contact_phone', '')
+        contact_email = data.get('contact_email', '')
+        note = data.get('note', '')
 
         if not event_name or not city or not date:
             return jsonify({"success": False, "message": "缺少必要参数"}), 400
 
+        if not contact_name or not contact_phone:
+            return jsonify({"success": False, "message": "请填写联系方式"}), 400
+
         group_code = generate_group_code(event_name, city, date, custom_suffix)
 
-        # 保存口令，避免第一个用户进入时提示"口令不存在"
+        # 保存口令和联系信息
         room_data = load_data()
         if "activities" not in room_data:
             room_data["activities"] = []
+        if "activity_contacts" not in room_data:
+            room_data["activity_contacts"] = {}
+
         if group_code not in room_data["activities"]:
             room_data["activities"].append(group_code)
+
+        # 保存联系信息
+        room_data["activity_contacts"][group_code] = {
+            "event_name": event_name,
+            "city": city,
+            "date": date,
+            "custom_suffix": custom_suffix,
+            "contact_name": contact_name,
+            "contact_phone": contact_phone,
+            "contact_email": contact_email,
+            "note": note,
+            "created_at": time.time()
+        }
+
         save_data(room_data)
+
+        # 发送邮件通知：新群口令生成
+        email_body = f"""新群口令已生成
+
+活动信息：
+- 活动名称：{event_name}
+- 城市：{city}
+- 日期：{date}
+- 自定义后缀：{custom_suffix if custom_suffix else '无'}
+- 生成的群口令：{group_code}
+
+联系人信息：
+- 姓名：{contact_name}
+- 手机号：{contact_phone}
+- 邮箱：{contact_email if contact_email else '未填写'}
+- 备注：{note if note else '无'}
+"""
+        send_email_notification(
+            f"[Roomie] 新群口令生成 - {group_code}",
+            email_body
+        )
 
         return jsonify({
             "success": True,
@@ -428,6 +511,27 @@ def submit_form():
 
             save_data(room_data)
 
+            # 发送邮件通知：匹配成功
+            email_body = f"""拼房匹配成���！
+
+群口令：{data['group_code']}
+
+用户A：{new_user['name']}
+性别：{new_user['gender']}
+日期：{new_user['check_in']} - {new_user['check_out']}
+
+用户B：{matched_user['name']}
+性别：{matched_user['gender']}
+日期：{matched_user['check_in']} - {matched_user['check_out']}
+
+匹配类型：{'完全匹配' if date_match_type == 'exact' else '部分匹配'}
+状态：等待双方确认
+"""
+            send_email_notification(
+                f"[Roomie] 匹配成功 - {new_user['name']} & {matched_user['name']}",
+                email_body
+            )
+
             return jsonify({
                 "success": True,
                 "matched": True,
@@ -450,6 +554,25 @@ def submit_form():
                 room_data["users"].append(new_user)
 
             save_data(room_data)
+
+            # 发送邮件通知：新用户提交
+            email_body = f"""新用户提交拼房信息
+
+群口令：{data['group_code']}
+姓名：{data['name']}
+性别：{data['gender']}
+入住日期：{data['check_in']} - {data['check_out']}
+吸烟：{data['smoking']}
+作息：{data['schedule']}
+抗噪：{data['noise_in']}
+出声：{data['noise_out']}
+
+状态：等待匹配
+"""
+            send_email_notification(
+                f"[Roomie] 新用户提交 - {data['name']}",
+                email_body
+            )
 
             return jsonify({
                 "success": True,

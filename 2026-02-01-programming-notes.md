@@ -67,10 +67,9 @@ ID编号: 258533809
                                                                                                         
   第一部分：进入与离开（大门钥匙）                                                                      
                                                                                                         
-  登录服务器                                                                                            
-                                                                                                        
-  ssh root@49.233.127.228
-
+登录服务器                 
+  
+ssh root@49.233.127.228
   目录导航
 
   cd /root/Roomie-Claude    # 进入项目文件夹
@@ -511,7 +510,7 @@ claude --resume <session-id>
 
 **示例：**
 ```bash
-claude --resume aadbbf29-4f91-447e-85eb-a917352a81dd
+`claude --resume aadbbf29-4f91-447e-85eb-a917352a81dd`
 ```
 
 ### 在项目目录自动恢复
