@@ -460,6 +460,7 @@
           <input readonly id="r-wechat-confirmed" style="width:100%;border:1px solid #9ae6b4;border-radius:8px;padding:12px;font-size:18px;font-weight:bold;color:#276749;text-align:center;background:#fff;box-sizing:border-box;" />
         </div>
         <button class="btn btn-secondary" style="margin-top:10px" onclick="showPage('page-home')">返回首页</button>
+        <button class="btn btn-danger" style="margin-top:10px" onclick="unmatchConfirmed()">重新匹配</button>
       </div>
     </div>
 
@@ -852,17 +853,22 @@
   async function confirmMatch() {
     if (state.countdownTimer) clearInterval(state.countdownTimer);
     try {
-      await fetch(`${API}/api/confirm`, {
+      const res = await fetch(`${API}/api/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wechat_id: state.wechatId, group_code: state.groupCode })
       });
-    } catch(e) {}
-    if (state.matchData) {
-      document.getElementById('r-wechat-confirmed').value = state.matchData.wechat_id;
-      document.getElementById('match-actions').style.display = 'none';
-      document.getElementById('countdown-tip').style.display = 'none';
-      document.getElementById('match-confirmed').style.display = 'block';
+      const data = await res.json();
+      if (data.success && state.matchData) {
+        document.getElementById('r-wechat-confirmed').value = state.matchData.wechat_id;
+        document.getElementById('match-actions').style.display = 'none';
+        document.getElementById('countdown-tip').style.display = 'none';
+        document.getElementById('match-confirmed').style.display = 'block';
+      } else {
+        alert(data.message || '确认失败，请重试');
+      }
+    } catch(e) {
+      alert('网络错误，请重试');
     }
   }
 
@@ -870,6 +876,18 @@
     if (state.countdownTimer) clearInterval(state.countdownTimer);
     try {
       await fetch(`${API}/api/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wechat_id: state.wechatId, group_code: state.groupCode })
+      });
+    } catch(e) {}
+    showPage('page-home');
+  }
+
+  async function unmatchConfirmed() {
+    if (!confirm('确认解除当前匹配？解除后将重新进入匹配池。')) return;
+    try {
+      await fetch(`${API}/api/unmatch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wechat_id: state.wechatId, group_code: state.groupCode })
