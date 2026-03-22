@@ -291,6 +291,9 @@ def submit_form():
             if field not in data:
                 return jsonify({"success": False, "message": f"缺少字段: {field}"}), 400
 
+        # has_booked 可选，前端不传则默认 no
+        data.setdefault('has_booked', 'no')
+
         room_data = load_data()
 
         # 清理过期的 pending 状态
@@ -365,6 +368,7 @@ def submit_form():
                 "schedule": data["schedule"],
                 "noise_in": data["noise_in"],
                 "noise_out": data["noise_out"],
+                "has_booked": data.get("has_booked", "no"),
                 "group_code": data["group_code"],
                 "status": "active",
                 "created_at": time.time(),
@@ -403,6 +407,10 @@ def submit_form():
                     user["check_out"] == data["check_out"] and
                     user["smoking"] == data["smoking"] and
                     user["schedule"] == data["schedule"]):
+
+                    # 两人都已订房则不匹配
+                    if data.get("has_booked", "no") == "yes" and user.get("has_booked", "no") == "yes":
+                        continue
 
                     # 噪音兼容性检查
                     if data["noise_in"] == "weak" and user["noise_out"] != "silent":

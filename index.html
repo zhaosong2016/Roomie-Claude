@@ -415,6 +415,19 @@
         </div>
       </div>
     </div>
+    <div class="form-group">
+      <label>是否已订房</label>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="has_booked" id="hb-no" value="no" checked>
+          <label for="hb-no">还没订</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="has_booked" id="hb-yes" value="yes">
+          <label for="hb-yes">已订房</label>
+        </div>
+      </div>
+    </div>
     <div id="form-error" class="alert alert-error" style="display:none"></div>
     <button class="btn btn-primary" onclick="submitForm()">开始匹配</button>
     <button class="btn btn-secondary" style="margin-top:10px" onclick="showPage('page-home')">返回</button>
@@ -721,6 +734,7 @@
     const schedule = getRadio('schedule');
     const noise_in = getRadio('noise_in');
     const noise_out = getRadio('noise_out');
+    const has_booked = getRadio('has_booked') || 'no';
     const errEl = document.getElementById('form-error');
     errEl.style.display = 'none';
 
@@ -737,7 +751,7 @@
       const res = await fetch(`${API}/api/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, wechat_id: wechat, group_code: groupCode, gender, check_in: checkin, check_out: checkout, smoking, schedule, noise_in, noise_out })
+        body: JSON.stringify({ name, wechat_id: wechat, group_code: groupCode, gender, check_in: checkin, check_out: checkout, smoking, schedule, noise_in, noise_out, has_booked })
       });
       const data = await res.json();
       showPage('page-result');
