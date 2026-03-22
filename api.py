@@ -421,23 +421,53 @@ def submit_form():
                     matched_user = user
                     break
         else:
-            # 第二次及以后提交：部分匹配（放宽条件）
-            partial_matches = []
+            # 第二次及以后提交：先尝试严格匹配（日期完全一致，不限submit_count）
             for user in room_data["users"]:
-                # 跳过自己
                 if openid and user.get("openid") == openid:
                     continue
                 if not openid and user["wechat_id"] == data["wechat_id"]:
                     continue
-
-                # 跳过历史匹配过的人
                 user_id = user.get("openid") if user.get("openid") else user["wechat_id"]
                 if user_id in history_ids:
                     continue
+                if (user["status"] == "active" and
+                    user["group_code"] == data["group_code"] and
+                    user["gender"] == data["gender"] and
+                    user["check_in"] == data["check_in"] and
+                    user["check_out"] == data["check_out"] and
+                    user["smoking"] == data["smoking"] and
+                    user["schedule"] == data["schedule"]):
+                    noise_ok = True
+                    if data["noise_in"] == "weak" and user["noise_out"] != "silent":
+                        noise_ok = False
+                    if user["noise_in"] == "weak" and data["noise_out"] != "silent":
+                        noise_ok = False
+                    if data["noise_in"] == "medium" and user["noise_out"] == "bass":
+                        noise_ok = False
+                    if user["noise_in"] == "medium" and data["noise_out"] == "bass":
+                        noise_ok = False
+                    if data["noise_out"] == "bass" and user["noise_in"] != "strong":
+                        noise_ok = False
+                    if user["noise_out"] == "bass" and data["noise_in"] != "strong":
+                        noise_ok = False
+                    if noise_ok:
+                        matched_user = user
+                        break
 
-                # 只匹配同样是第二次及以后提交的用户（保护第一次提交的用户）
-                if user.get("submit_count", 1) < 2:
-                    continue
+            # 严格匹配没找到，再用放宽逻辑（日期有交集，只找submit_count>=2的用户）
+            if not matched_user:
+                partial_matches = []
+                for user in room_data["users"]:
+                    if openid and user.get("openid") == openid:
+                        continue
+                    if not openid and user["wechat_id"] == data["wechat_id"]:
+                        continue
+                    user_id = user.get("openid") if user.get("openid") else user["wechat_id"]
+                    if user_id in history_ids:
+                        continue
+                    # 放宽逻辑仍然只匹配第二次及以后提交的用户
+                    if user.get("submit_count", 1) < 2:
+                        continue
 
                 if (user["status"] == "active" and
                     user["group_code"] == data["group_code"] and
@@ -962,6 +992,70 @@ def submit_wish():
     except Exception as e:
         print(f"提交许愿错误: {e}")
         return jsonify({"success": False, "message": "提交失败"}), 500
+
+
+@app.route('/api/dashboard', methods=['GET'])
+def dashboard():
+    schedule_map = {"early_bird": "早起型", "night_owl": "夜猫型"}
+    noise_in_map = {"weak": "轻度敏感", "medium": "适中", "strong": "耐受力强"}
+    noise_out_map = {"silent": "安静", "medium": "适中", "loud": "较吵", "bass": "低音炮"}
+
+    room_data = load_data()
+
+    users = room_data.get("users", [])
+    group_code = request.args.get("group_code", "HHHZ0327")
+    target_users = [u for u in users if u.get("group_code") == group_code]
+
+    matched = [u for u in target_users if u.get("status") == "matched"]
+    active = [u for u in target_users if u.get("status") == "active"]
+
+    seen_pairs = set()
+    pairs = []
+    for u in matched:
+        pid = u.get("pair_id", "")
+        if pid and pid not in seen_pairs:
+            seen_pairs.add(pid)
+            partner = next((x for x in matched if x.get("pair_id") == pid and x["wechat_id"] != u["wechat_id"]), None)
+            if partner:
+                pairs.append({
+                    "A": {"name": u["name"], "gender": "女" if u["gender"] == "female" else "男",
+                          "check_in": u["check_in"], "check_out": u["check_out"],
+                          "smoking": "吸烟" if u["smoking"] == "yes" else "不吸烟",
+                          "schedule": schedule_map.get(u["schedule"], u["schedule"]),
+                          "noise_out": noise_out_map.get(u["noise_out"], u["noise_out"])},
+                    "B": {"name": partner["name"], "gender": "女" if partner["gender"] == "female" else "男",
+                          "check_in": partner["check_in"], "check_out": partner["check_out"],
+                          "smoking": "吸烟" if partner["smoking"] == "yes" else "不吸烟",
+                          "schedule": schedule_map.get(partner["schedule"], partner["schedule"]),
+                          "noise_out": noise_out_map.get(partner["noise_out"], partner["noise_out"])}
+                })
+
+    waiting = []
+    for u in active:
+        waiting.append({
+            "name": u["name"],
+            "gender": "女" if u["gender"] == "female" else "男",
+            "check_in": u["check_in"],
+            "check_out": u["check_out"],
+            "smoking": "吸烟" if u["smoking"] == "yes" else "不吸烟",
+            "schedule": schedule_map.get(u["schedule"], u["schedule"]),
+            "noise_in": noise_in_map.get(u["noise_in"], u["noise_in"]),
+            "noise_out": noise_out_map.get(u["noise_out"], u["noise_out"]),
+            "contact": u.get("wechat_id", ""),
+            "submit_count": u.get("submit_count", 1)
+        })
+
+    return jsonify({
+        "group_code": group_code,
+        "summary": {
+            "total": len(target_users),
+            "matched_pairs": len(pairs),
+            "matched_users": len(matched),
+            "waiting": len(active)
+        },
+        "matched_pairs": pairs,
+        "waiting_users": waiting
+    })
 
 
 if __name__ == '__main__':
