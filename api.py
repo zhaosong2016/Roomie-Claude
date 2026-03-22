@@ -14,7 +14,7 @@ from pypinyin import lazy_pinyin, Style
 app = Flask(__name__)
 CORS(app)
 
-DATA_FILE = "room_data.json"
+DATA_FILE = "/root/Roomie-Claude/room_data.json"
 WISH_FILE = "wishes.json"
 
 # 微信小程序配置
@@ -428,6 +428,43 @@ def submit_form():
 
                     matched_user = user
                     break
+
+            # 严格匹配失败，检查是否有日期包含关系（对方日期是当前用户日期的子集）
+            if not matched_user:
+                for user in room_data["users"]:
+                    if openid and user.get("openid") == openid:
+                        continue
+                    if not openid and user["wechat_id"] == data["wechat_id"]:
+                        continue
+                    user_id = user.get("openid") if user.get("openid") else user["wechat_id"]
+                    if user_id in history_ids:
+                        continue
+                    if (user["status"] == "active" and
+                        user["group_code"] == data["group_code"] and
+                        user["gender"] == data["gender"] and
+                        user["smoking"] == data["smoking"] and
+                        user["schedule"] == data["schedule"] and
+                        user["check_in"] >= data["check_in"] and
+                        user["check_out"] <= data["check_out"] and
+                        not (user["check_in"] == data["check_in"] and user["check_out"] == data["check_out"])):
+                        if data.get("has_booked", "no") == "yes" and user.get("has_booked", "no") == "yes":
+                            continue
+                        noise_ok = True
+                        if data["noise_in"] == "weak" and user["noise_out"] != "silent":
+                            noise_ok = False
+                        if user["noise_in"] == "weak" and data["noise_out"] != "silent":
+                            noise_ok = False
+                        if data["noise_in"] == "medium" and user["noise_out"] == "bass":
+                            noise_ok = False
+                        if user["noise_in"] == "medium" and data["noise_out"] == "bass":
+                            noise_ok = False
+                        if data["noise_out"] == "bass" and user["noise_in"] != "strong":
+                            noise_ok = False
+                        if user["noise_out"] == "bass" and data["noise_in"] != "strong":
+                            noise_ok = False
+                        if noise_ok:
+                            matched_user = user
+                            break
         else:
             # 第二次及以后提交：先尝试严格匹配（日期完全一致，不限submit_count）
             for user in room_data["users"]:
