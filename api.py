@@ -394,6 +394,9 @@ def submit_form():
                     continue
                 if not openid and user["wechat_id"] == data["wechat_id"]:
                     continue
+                # 跳过同名同群的人（防止填错微信号后匹配到自己）
+                if user["name"] == data["name"] and user["group_code"] == data["group_code"]:
+                    continue
 
                 # 跳过历史匹配过的人
                 user_id = user.get("openid") if user.get("openid") else user["wechat_id"]
@@ -472,6 +475,9 @@ def submit_form():
                     continue
                 if not openid and user["wechat_id"] == data["wechat_id"]:
                     continue
+                # 跳过同名同群的人（防止填错微信号后匹配到自己）
+                if user["name"] == data["name"] and user["group_code"] == data["group_code"]:
+                    continue
                 user_id = user.get("openid") if user.get("openid") else user["wechat_id"]
                 if user_id in history_ids:
                     continue
@@ -514,40 +520,40 @@ def submit_form():
                     if user.get("submit_count", 1) < 2:
                         continue
 
-                if (user["status"] == "active" and
-                    user["group_code"] == data["group_code"] and
-                    user["gender"] == data["gender"] and
-                    user["smoking"] == data["smoking"] and
-                    user["schedule"] == data["schedule"]):
+                    if (user["status"] == "active" and
+                            user["group_code"] == data["group_code"] and
+                            user["gender"] == data["gender"] and
+                            user["smoking"] == data["smoking"] and
+                            user["schedule"] == data["schedule"]):
 
-                    # 检查噪音兼容性
-                    noise_compatible = True
-                    if data["noise_in"] == "weak" and user["noise_out"] != "silent":
-                        noise_compatible = False
-                    if user["noise_in"] == "weak" and data["noise_out"] != "silent":
-                        noise_compatible = False
-                    if data["noise_in"] == "medium" and user["noise_out"] == "bass":
-                        noise_compatible = False
-                    if user["noise_in"] == "medium" and data["noise_out"] == "bass":
-                        noise_compatible = False
-                    if data["noise_out"] == "bass" and user["noise_in"] != "strong":
-                        noise_compatible = False
-                    if user["noise_out"] == "bass" and data["noise_in"] != "strong":
-                        noise_compatible = False
+                        # 检查噪音兼容性
+                        noise_compatible = True
+                        if data["noise_in"] == "weak" and user["noise_out"] != "silent":
+                            noise_compatible = False
+                        if user["noise_in"] == "weak" and data["noise_out"] != "silent":
+                            noise_compatible = False
+                        if data["noise_in"] == "medium" and user["noise_out"] == "bass":
+                            noise_compatible = False
+                        if user["noise_in"] == "medium" and data["noise_out"] == "bass":
+                            noise_compatible = False
+                        if data["noise_out"] == "bass" and user["noise_in"] != "strong":
+                            noise_compatible = False
+                        if user["noise_out"] == "bass" and data["noise_in"] != "strong":
+                            noise_compatible = False
 
-                    if noise_compatible:
-                        # 计算日期重叠
-                        has_overlap, overlap_start, overlap_end = calculate_date_overlap(
-                            data["check_in"], data["check_out"],
-                            user["check_in"], user["check_out"]
-                        )
+                        if noise_compatible:
+                            # 计算日期重叠
+                            has_overlap, overlap_start, overlap_end = calculate_date_overlap(
+                                data["check_in"], data["check_out"],
+                                user["check_in"], user["check_out"]
+                            )
 
-                        if has_overlap:
-                            partial_matches.append({
-                                "user": user,
-                                "overlap_start": overlap_start,
-                                "overlap_end": overlap_end
-                            })
+                            if has_overlap:
+                                partial_matches.append({
+                                    "user": user,
+                                    "overlap_start": overlap_start,
+                                    "overlap_end": overlap_end
+                                })
 
             # 如果有部分匹配，选择重叠天数最多的
             if partial_matches:
