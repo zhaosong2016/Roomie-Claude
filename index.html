@@ -442,6 +442,9 @@
         <div id="countdown-tip" class="countdown-tip" style="display:none">
           ⏰ 请在 <span id="countdown-num">60</span> 秒内选择，否则匹配将自动取消
         </div>
+        <div id="subset-tip" style="display:none;background:#fffbeb;border:1px solid #f6e05e;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:14px;color:#744210">
+          📅 对方的入住时间比你短，官方活动期间你们可以同住。是否接受？
+        </div>
         <div class="info-row"><span class="key">姓名</span><span class="val" id="r-name"></span></div>
         <div class="info-row"><span class="key">入住日期</span><span class="val" id="r-dates"></span></div>
         <div class="info-row"><span class="key">吸烟习惯</span><span class="val" id="r-smoking"></span></div>
@@ -779,6 +782,7 @@
       document.getElementById('r-noise-in').textContent = m.noise_in === 'weak' ? '敏感' : (m.noise_in === 'medium' ? '普通' : '不敏感');
       document.getElementById('r-noise-out').textContent = m.noise_out === 'silent' ? '安静' : (m.noise_out === 'loud' ? '偶有声响' : '声响较大');
       document.getElementById('result-matched').style.display = 'block';
+      document.getElementById('subset-tip').style.display = data.date_match_type === 'subset' ? 'block' : 'none';
 
       if (!state.isPending) {
         // 已经确认过的匹配，直接显示微信号
