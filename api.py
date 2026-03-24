@@ -305,6 +305,9 @@ def submit_form():
             if field not in data:
                 return jsonify({"success": False, "message": f"缺少字段: {field}"}), 400
 
+        # 微信号统一转小写，避免大小写不同导致重复记录
+        data['wechat_id'] = data['wechat_id'].strip().lower()
+
         # has_booked 可选，前端不传则默认 no
         data.setdefault('has_booked', 'no')
 
