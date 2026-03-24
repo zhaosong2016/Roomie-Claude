@@ -149,7 +149,7 @@ def calculate_date_overlap(check_in1: str, check_out1: str, check_in2: str, chec
         overlap_start = max(start1, start2)
         overlap_end = min(end1, end2)
 
-        if overlap_start <= overlap_end:
+        if overlap_start < overlap_end:
             return True, overlap_start.strftime('%Y-%m-%d'), overlap_end.strftime('%Y-%m-%d')
         else:
             return False, None, None
