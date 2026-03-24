@@ -62,7 +62,21 @@ def load_data():
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
-        return {"users": [], "stats": {"total_matches": 0}}
+        return {"users": [], "stats": {"total_matches": 0}, "logs": []}
+
+
+def append_log(room_data, event, name_a, name_b, group_code, note=""):
+    """记录操作日志"""
+    if "logs" not in room_data:
+        room_data["logs"] = []
+    room_data["logs"].append({
+        "time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        "event": event,
+        "a": name_a,
+        "b": name_b,
+        "group": group_code,
+        "note": note
+    })
 
 
 def save_data(room_data):
@@ -615,6 +629,7 @@ def submit_form():
                 f"[Roomie] 匹配成功 - {new_user['name']} & {matched_user['name']}",
                 email_body
             )
+            append_log(room_data, "matched", new_user["name"], matched_user["name"], data["group_code"])
 
             return jsonify({
                 "success": True,
@@ -726,6 +741,7 @@ def confirm_match():
 
                 # 更新统计
                 room_data["stats"]["total_matches"] += 1
+                append_log(room_data, "confirmed", user_a["name"], user_b["name"], group_code)
 
         save_data(room_data)
 
@@ -794,6 +810,8 @@ def reject_match():
                     u.pop("matched_partner", None)
                     u.pop("pending_at", None)
 
+            append_log(room_data, "rejected", user_a["name"], user_b["name"], group_code)
+
         save_data(room_data)
 
         return jsonify({"success": True, "message": "已拒绝此匹配"})
@@ -859,6 +877,8 @@ def unmatch():
                     u["status"] = "active"
                     u.pop("pair_id", None)
                     u.pop("matched_partner", None)
+
+            append_log(room_data, "unmatched", user_a["name"], user_b["name"], group_code)
 
         save_data(room_data)
 
@@ -983,6 +1003,17 @@ def check_match():
     except Exception as e:
         print(f"检查匹配错误: {e}")
         return jsonify({"success": False, "message": "检查失败"}), 500
+
+
+@app.route('/api/logs', methods=['GET'])
+def get_logs():
+    """查看操作日志"""
+    room_data = load_data()
+    logs = room_data.get("logs", [])
+    group_code = request.args.get("group_code")
+    if group_code:
+        logs = [l for l in logs if l.get("group") == group_code]
+    return jsonify({"logs": list(reversed(logs))})  # 最新的在前
 
 
 @app.route('/api/health', methods=['GET'])
