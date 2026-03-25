@@ -329,8 +329,8 @@ def submit_form():
         if not existing_user:
             existing_user = next((u for u in room_data["users"] if u["wechat_id"] == data["wechat_id"] and u["group_code"] == data["group_code"]), None)
 
-        # 同名不同微信号检测（排除 removed 状态，force_submit 时跳过）
-        if not existing_user and not data.get("force_submit"):
+        # 同名不同微信号检测（排除 removed 状态）
+        if not existing_user:
             name_conflict = next((u for u in room_data["users"]
                 if u["name"] == data["name"]
                 and u["group_code"] == data["group_code"]

@@ -764,17 +764,7 @@
 
       // 同名不同微信号检测
       if (data.duplicate_name) {
-        const confirmed = confirm(`⚠️ 系统中已有一条您的记录（微信号：${data.existing_wechat}）。\n\n可能是之前填写时微信号有误，建议检查后重新填写。\n\n如确认当前填写的微信号（${wechat}）是正确的，点「确定」继续提交。`);
-        if (!confirmed) return;
-        // 用户确认继续，带 force_submit 标志重新提交
-        const res2 = await fetch(`${API}/api/submit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, wechat_id: wechat, group_code: groupCode, gender, check_in: checkin, check_out: checkout, smoking, schedule, noise_in, noise_out, has_booked, force_submit: true })
-        });
-        const data2 = await res2.json();
-        showPage('page-result');
-        handleResult(data2);
+        alert(`系统中已有一条您的记录（微信号：${data.existing_wechat}）。\n\n如果确认是您，请把微信号改为「${data.existing_wechat}」再提交，防止出现多条记录导致被重复联系。`);
         return;
       }
 
