@@ -520,7 +520,46 @@ claude
 
 ---
 
-- 域名备案通过：myspaceone.com
+---
+
+### 2026-03-25 新增"我不介意"选项（吸烟 & 作息）
+
+#### 背景
+用户填写时只能选吸烟/不吸烟、早鸟/夜猫子，导致宽松型用户也只能匹配同类，匹配率偏低。
+
+#### 改动内容
+
+**新字段值**
+- `smoking` 新增 `any`（我不介意）
+- `schedule` 新增 `any`（我不介意）
+
+**匹配规则（非对称设计）**
+- 吸烟：`no` 只匹配 `no`；`yes`/`any` 互相可配
+- 作息：`early_bird` 只匹配 `early_bird`；`night_owl`/`any` 互相可配
+- 原则：敏感方不被动接受宽松方，宽松方向需要被接受的一侧（吸烟、夜猫子）倾斜
+
+**实现方式（api.py）**
+```python
+def smoking_ok(a, b):
+    if a == "no": return b == "no"
+    if b == "no": return False
+    return True  # yes+yes, yes+any, any+any
+
+def schedule_ok(a, b):
+    if a == "early_bird": return b == "early_bird"
+    if b == "early_bird": return False
+    return True  # night_owl+night_owl, night_owl+any, any+any
+```
+4处匹配逻辑（严格/子集/第二次严格/放宽）全部替换为辅助函数。
+
+**前端（index.html）**
+- 吸烟：新增"我不介意"radio（value=`any`）
+- 作息：新增"[我不介意] 睡眠适应能力强，都可以"radio（value=`any`）
+- 结果页显示逻辑同步更新
+
+**兼容性**：老数据无 `any` 值，`get("smoking","no")` 默认回退，不影响现有用户。
+
+**最后更新**：2026-03-25
 - 安装 nginx，配置反向代理（80端口 → Flask 5000端口）
 - 腾讯云安全组开放 80、443 端口
 - Let's Encrypt 申请 SSL 证书，HTTPS 正常

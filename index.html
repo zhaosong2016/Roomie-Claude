@@ -366,6 +366,10 @@
           <input type="radio" name="smoking" id="s-yes" value="yes">
           <label for="s-yes">吸烟</label>
         </div>
+        <div class="radio-option">
+          <input type="radio" name="smoking" id="s-any" value="any">
+          <label for="s-any">我不介意</label>
+        </div>
       </div>
     </div>
     <div class="form-group">
@@ -378,6 +382,10 @@
         <div class="radio-option" style="min-width:100%">
           <input type="radio" name="schedule" id="sc-night" value="night_owl">
           <label for="sc-night">[夜猫子] 越晚越精神，深夜才是自由时间</label>
+        </div>
+        <div class="radio-option" style="min-width:100%">
+          <input type="radio" name="schedule" id="sc-any" value="any">
+          <label for="sc-any">[我不介意] 睡眠适应能力强，都可以</label>
         </div>
       </div>
     </div>
@@ -787,8 +795,8 @@
       const m = data.match || data.match_info;
       document.getElementById('r-name').textContent = m.name;
       document.getElementById('r-dates').textContent = `${m.check_in} 至 ${m.check_out}`;
-      document.getElementById('r-smoking').textContent = m.smoking === 'yes' ? '吸烟' : '不吸烟';
-      document.getElementById('r-schedule').textContent = m.schedule === 'early_bird' ? '早睡鸟' : '夜猫子';
+      document.getElementById('r-smoking').textContent = m.smoking === 'yes' ? '吸烟' : m.smoking === 'no' ? '不吸烟' : '我不介意';
+      document.getElementById('r-schedule').textContent = m.schedule === 'early_bird' ? '早睡鸟' : m.schedule === 'night_owl' ? '夜猫子' : '我不介意';
       document.getElementById('r-noise-in').textContent = m.noise_in === 'weak' ? '敏感' : (m.noise_in === 'medium' ? '普通' : '不敏感');
       document.getElementById('r-noise-out').textContent = m.noise_out === 'silent' ? '安静' : (m.noise_out === 'loud' ? '偶有声响' : '声响较大');
       document.getElementById('result-matched').style.display = 'block';
