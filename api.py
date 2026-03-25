@@ -158,6 +158,19 @@ def calculate_date_overlap(check_in1: str, check_out1: str, check_in2: str, chec
         return False, None, None
 
 
+
+def smoking_ok(a, b):
+    """不吸烟只匹配不吸烟；any(我不介意)可匹配吸烟和any"""
+    if a == "no": return b == "no"
+    if b == "no": return False
+    return True
+
+def schedule_ok(a, b):
+    """早鸟只匹配早鸟；any(我不介意)可匹配夜猫子和any"""
+    if a == "early_bird": return b == "early_bird"
+    if b == "early_bird": return False
+    return True
+
 def clean_expired_pending(room_data):
     """清理超过1分钟的 pending 状态，自动变回 active"""
     current_time = time.time()
@@ -440,8 +453,8 @@ def submit_form():
                     user["gender"] == data["gender"] and
                     user["check_in"] == data["check_in"] and
                     user["check_out"] == data["check_out"] and
-                    user["smoking"] == data["smoking"] and
-                    user["schedule"] == data["schedule"]):
+                    smoking_ok(user.get("smoking","no"), data["smoking"]) and
+                    schedule_ok(user.get("schedule","early_bird"), data["schedule"])):
 
                     # 两人都已订房则不匹配
                     if data.get("has_booked", "no") == "yes" and user.get("has_booked", "no") == "yes":
@@ -477,8 +490,8 @@ def submit_form():
                     if (user["status"] == "active" and
                         user["group_code"] == data["group_code"] and
                         user["gender"] == data["gender"] and
-                        user["smoking"] == data["smoking"] and
-                        user["schedule"] == data["schedule"] and
+                        smoking_ok(user.get("smoking","no"), data["smoking"]) and
+                        schedule_ok(user.get("schedule","early_bird"), data["schedule"]) and
                         user["check_in"] >= data["check_in"] and
                         user["check_out"] <= data["check_out"] and
                         not (user["check_in"] == data["check_in"] and user["check_out"] == data["check_out"])):
@@ -518,8 +531,8 @@ def submit_form():
                     user["gender"] == data["gender"] and
                     user["check_in"] == data["check_in"] and
                     user["check_out"] == data["check_out"] and
-                    user["smoking"] == data["smoking"] and
-                    user["schedule"] == data["schedule"]):
+                    smoking_ok(user.get("smoking","no"), data["smoking"]) and
+                    schedule_ok(user.get("schedule","early_bird"), data["schedule"])):
                     noise_ok = True
                     if data["noise_in"] == "weak" and user["noise_out"] != "silent":
                         noise_ok = False
@@ -555,8 +568,8 @@ def submit_form():
                     if (user["status"] == "active" and
                             user["group_code"] == data["group_code"] and
                             user["gender"] == data["gender"] and
-                            user["smoking"] == data["smoking"] and
-                            user["schedule"] == data["schedule"]):
+                            smoking_ok(user.get("smoking","no"), data["smoking"]) and
+                            schedule_ok(user.get("schedule","early_bird"), data["schedule"])):
 
                         # 检查噪音兼容性
                         noise_compatible = True
@@ -1096,7 +1109,7 @@ def submit_wish():
 
 @app.route('/api/dashboard', methods=['GET'])
 def dashboard():
-    schedule_map = {"early_bird": "早起型", "night_owl": "夜猫型"}
+    schedule_map = {"early_bird": "早起型", "night_owl": "夜猫型", "any": "我不介意"}
     noise_in_map = {"weak": "轻度敏感", "medium": "适中", "strong": "耐受力强"}
     noise_out_map = {"silent": "安静", "medium": "适中", "loud": "较吵", "bass": "低音炮"}
 
@@ -1120,12 +1133,12 @@ def dashboard():
                 pairs.append({
                     "A": {"name": u["name"], "gender": "女" if u["gender"] == "female" else "男",
                           "check_in": u["check_in"], "check_out": u["check_out"],
-                          "smoking": "吸烟" if u["smoking"] == "yes" else "不吸烟",
+                          "smoking": {"yes":"吸烟","no":"不吸烟","any":"我不介意"}.get(u.get("smoking","no"),"不吸烟"),
                           "schedule": schedule_map.get(u["schedule"], u["schedule"]),
                           "noise_out": noise_out_map.get(u["noise_out"], u["noise_out"])},
                     "B": {"name": partner["name"], "gender": "女" if partner["gender"] == "female" else "男",
                           "check_in": partner["check_in"], "check_out": partner["check_out"],
-                          "smoking": "吸烟" if partner["smoking"] == "yes" else "不吸烟",
+                          "smoking": {"yes":"吸烟","no":"不吸烟","any":"我不介意"}.get(partner.get("smoking","no"),"不吸烟"),
                           "schedule": schedule_map.get(partner["schedule"], partner["schedule"]),
                           "noise_out": noise_out_map.get(partner["noise_out"], partner["noise_out"])}
                 })
@@ -1137,7 +1150,7 @@ def dashboard():
             "gender": "女" if u["gender"] == "female" else "男",
             "check_in": u["check_in"],
             "check_out": u["check_out"],
-            "smoking": "吸烟" if u["smoking"] == "yes" else "不吸烟",
+            "smoking": {"yes":"吸烟","no":"不吸烟","any":"我不介意"}.get(u.get("smoking","no"),"不吸烟"),
             "schedule": schedule_map.get(u["schedule"], u["schedule"]),
             "noise_in": noise_in_map.get(u["noise_in"], u["noise_in"]),
             "noise_out": noise_out_map.get(u["noise_out"], u["noise_out"]),
