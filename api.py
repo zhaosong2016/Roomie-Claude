@@ -329,6 +329,21 @@ def submit_form():
         if not existing_user:
             existing_user = next((u for u in room_data["users"] if u["wechat_id"] == data["wechat_id"] and u["group_code"] == data["group_code"]), None)
 
+        # 同名不同微信号检测（排除 removed 状态，force_submit 时跳过）
+        if not existing_user and not data.get("force_submit"):
+            name_conflict = next((u for u in room_data["users"]
+                if u["name"] == data["name"]
+                and u["group_code"] == data["group_code"]
+                and u["wechat_id"] != data["wechat_id"]
+                and u.get("status") != "removed"), None)
+            if name_conflict:
+                return jsonify({
+                    "success": False,
+                    "duplicate_name": True,
+                    "existing_wechat": name_conflict["wechat_id"],
+                    "message": f"系统中已有一条您的记录（微信号：{name_conflict['wechat_id']}），可能导致被重复联系。请确认您的微信号是否填写正确。"
+                })
+
         if existing_user:
             if existing_user["status"] == "matched" or existing_user["status"] == "pending":
                 # 查找匹配的伙伴
