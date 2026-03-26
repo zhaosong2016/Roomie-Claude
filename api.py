@@ -172,9 +172,9 @@ def schedule_ok(a, b):
     return True
 
 def clean_expired_pending(room_data):
-    """清理超过1分钟的 pending 状态，自动变回 active"""
+    """清理超过2分钟的 pending 状态，自动变回 active"""
     current_time = time.time()
-    timeout = 60  # 1分钟
+    timeout = 120  # 2分钟
 
     for user in room_data["users"]:
         if user["status"] == "pending":
@@ -661,6 +661,7 @@ def submit_form():
                 email_body
             )
             append_log(room_data, "matched", new_user["name"], matched_user["name"], data["group_code"])
+            save_data(room_data)
 
             return jsonify({
                 "success": True,
@@ -766,8 +767,10 @@ def confirm_match():
                     user_b["history"].append(user_a_id)
 
                 # 变为 matched 状态
+                confirmed_at = time.time()
                 for u in paired_users:
                     u["status"] = "matched"
+                    u["confirmed_at"] = confirmed_at
                     u.pop("pending_at", None)
 
                 # 更新统计
@@ -909,7 +912,10 @@ def unmatch():
                     u.pop("pair_id", None)
                     u.pop("matched_partner", None)
 
-            append_log(room_data, "unmatched", user_a["name"], user_b["name"], group_code)
+            confirmed_at = user_a.get("confirmed_at") or user_b.get("confirmed_at")
+            minutes = round((time.time() - confirmed_at) / 60) if confirmed_at else None
+            note = f"by:{user['name']}" + (f" after:{minutes}min" if minutes is not None else "")
+            append_log(room_data, "unmatched", user_a["name"], user_b["name"], group_code, note=note)
 
         save_data(room_data)
 
