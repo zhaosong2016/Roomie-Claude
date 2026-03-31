@@ -1065,6 +1065,12 @@ def index():
     return send_file('index.html')
 
 
+@app.route('/shenzhen', methods=['GET'])
+def shenzhen_index():
+    """深圳游学分享报名"""
+    return send_file('shenzhen.html')
+
+
 @app.route('/api/wish', methods=['POST'])
 def submit_wish():
     """提交想法/建议/问题/表扬"""
@@ -1175,6 +1181,199 @@ def dashboard():
         "matched_pairs": pairs,
         "waiting_users": waiting
     })
+
+
+# ══════════════════════════════════════════════════════════
+# 深圳游学分享报名系统
+# ══════════════════════════════════════════════════════════
+
+SHENZHEN_FILE = "/root/Roomie-Claude/shenzhen_data.json"
+SHENZHEN_ADMIN_PASSWORD = "szyx2026"
+
+
+def load_shenzhen():
+    try:
+        with open(SHENZHEN_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"topics": [], "signups": []}
+
+
+def save_shenzhen(data):
+    with open(SHENZHEN_FILE, 'w', encoding='utf-8') as f:
+        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+        try:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        finally:
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+
+def check_admin(req):
+    return req.headers.get('X-Admin-Password') == SHENZHEN_ADMIN_PASSWORD
+
+
+@app.route('/api/shenzhen/propose', methods=['POST'])
+def shenzhen_propose():
+    body = request.get_json()
+    name = (body.get('name') or '').strip()
+    company = (body.get('company') or '').strip()
+    job_title = (body.get('job_title') or '').strip()
+    topic = (body.get('topic') or '').strip()
+    desc = (body.get('desc') or '').strip()
+    phone = (body.get('phone') or '').strip()
+
+    if not all([name, company, job_title, topic, phone]):
+        return jsonify({"success": False, "message": "请填写所有必填项"})
+
+    data = load_shenzhen()
+
+    # 同手机号已提交过主题
+    existing = next((t for t in data['topics'] if t['phone'] == phone and not t.get('cancelled')), None)
+    if existing:
+        return jsonify({"success": False, "message": "你已提交过分享话题"})
+
+    # 已报名的人不能再提交主题
+    signup = next((s for s in data['signups'] if s['phone'] == phone), None)
+    if signup:
+        return jsonify({"success": False, "message": "你已报名了其他话题，不能再提交分享"})
+
+    topic_id = hashlib.md5((phone + str(time.time())).encode()).hexdigest()[:12]
+    data['topics'].append({
+        "id": topic_id,
+        "name": name,
+        "company": company,
+        "job_title": job_title,
+        "topic": topic,
+        "desc": desc,
+        "phone": phone,
+        "created_at": time.time(),
+        "cancelled": False
+    })
+    save_shenzhen(data)
+    return jsonify({"success": True})
+
+
+@app.route('/api/shenzhen/topics', methods=['GET'])
+def shenzhen_topics():
+    data = load_shenzhen()
+    # 统计每个话题报名人数（只统计未取消话题的有效报名）
+    result = []
+    for t in data['topics']:
+        count = sum(1 for s in data['signups'] if s['topic_id'] == t['id'])
+        result.append({
+            "id": t['id'],
+            "name": t['name'],
+            "company": t['company'],
+            "job_title": t['job_title'],
+            "topic": t['topic'],
+            "desc": t.get('desc', ''),
+            "count": count,
+            "cancelled": t.get('cancelled', False)
+        })
+    # 按报名人数降序，取消的排最后
+    result.sort(key=lambda x: (x['cancelled'], -x['count']))
+    return jsonify({"topics": result})
+
+
+@app.route('/api/shenzhen/signup', methods=['POST'])
+def shenzhen_signup():
+    body = request.get_json()
+    name = (body.get('name') or '').strip()
+    phone = (body.get('phone') or '').strip()
+    topic_id = (body.get('topic_id') or '').strip()
+
+    if not all([name, phone, topic_id]):
+        return jsonify({"success": False, "message": "参数不完整"})
+
+    data = load_shenzhen()
+
+    # 话题是否存在且未取消
+    topic = next((t for t in data['topics'] if t['id'] == topic_id and not t.get('cancelled')), None)
+    if not topic:
+        return jsonify({"success": False, "message": "该话题不存在或已取消"})
+
+    # 分享者不能报名
+    is_proposer = any(t['phone'] == phone and not t.get('cancelled') for t in data['topics'])
+    if is_proposer:
+        return jsonify({"success": False, "is_proposer": True, "message": "你已提交过分享话题，不能同时报名"})
+
+    # 是否已报名（改报名则覆盖）
+    existing = next((s for s in data['signups'] if s['phone'] == phone), None)
+    changed = existing is not None and existing['topic_id'] != topic_id
+
+    if existing:
+        existing['topic_id'] = topic_id
+        existing['name'] = name
+        existing['updated_at'] = time.time()
+    else:
+        data['signups'].append({
+            "phone": phone,
+            "name": name,
+            "topic_id": topic_id,
+            "created_at": time.time()
+        })
+
+    save_shenzhen(data)
+    return jsonify({"success": True, "changed": changed, "topic_name": topic['topic']})
+
+
+@app.route('/api/shenzhen/check_signup', methods=['GET'])
+def shenzhen_check_signup():
+    phone = request.args.get('phone', '').strip()
+    if not phone:
+        return jsonify({"cancelled": False})
+
+    data = load_shenzhen()
+    signup = next((s for s in data['signups'] if s['phone'] == phone), None)
+    if not signup:
+        return jsonify({"cancelled": False})
+
+    topic = next((t for t in data['topics'] if t['id'] == signup['topic_id']), None)
+    cancelled = topic is None or topic.get('cancelled', False)
+    return jsonify({"cancelled": cancelled})
+
+
+@app.route('/api/shenzhen/admin/topics', methods=['GET'])
+def shenzhen_admin_topics():
+    if not check_admin(request):
+        return jsonify({"message": "无权限"}), 403
+
+    data = load_shenzhen()
+    result = []
+    for t in data['topics']:
+        signups = [{"name": s['name'], "phone": s['phone']}
+                   for s in data['signups'] if s['topic_id'] == t['id']]
+        result.append({
+            "id": t['id'],
+            "name": t['name'],
+            "company": t['company'],
+            "job_title": t['job_title'],
+            "topic": t['topic'],
+            "desc": t.get('desc', ''),
+            "phone": t['phone'],
+            "cancelled": t.get('cancelled', False),
+            "signups": signups
+        })
+    result.sort(key=lambda x: (x['cancelled'], -len(x['signups'])))
+    return jsonify({"topics": result})
+
+
+@app.route('/api/shenzhen/admin/delete_topic', methods=['POST'])
+def shenzhen_admin_delete():
+    if not check_admin(request):
+        return jsonify({"success": False, "message": "无权限"}), 403
+
+    body = request.get_json()
+    topic_id = (body.get('topic_id') or '').strip()
+
+    data = load_shenzhen()
+    topic = next((t for t in data['topics'] if t['id'] == topic_id), None)
+    if not topic:
+        return jsonify({"success": False, "message": "话题不存在"})
+
+    topic['cancelled'] = True
+    save_shenzhen(data)
+    return jsonify({"success": True})
 
 
 if __name__ == '__main__':
