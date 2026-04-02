@@ -767,8 +767,6 @@
     const noise_in = getRadio('noise_in');
     const noise_out = getRadio('noise_out');
     const has_booked = getRadio('has_booked') || 'no';
-    const errEl = document.getElementById('form-error');
-    errEl.style.display = 'none';
 
     if (!name || !wechat || !checkin || !checkout || !gender || !smoking || !schedule || !noise_in || !noise_out) {
       errEl.textContent = '请填写所有信息';
