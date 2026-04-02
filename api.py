@@ -1376,5 +1376,41 @@ def shenzhen_admin_delete():
     return jsonify({"success": True})
 
 
+FEEDBACK_FILE = '/root/Roomie-Claude/feedback_data.json'
+
+def load_feedback():
+    if os.path.exists(FEEDBACK_FILE):
+        with open(FEEDBACK_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {"feedbacks": []}
+
+def save_feedback(data):
+    with open(FEEDBACK_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    body = request.get_json()
+    feedback_type = (body.get('type') or '').strip()
+    content = (body.get('content') or '').strip()
+    is_public = body.get('is_public', True)
+
+    if not feedback_type or not content:
+        return jsonify({"success": False, "message": "请填写反馈内容"})
+    if len(content) > 500:
+        return jsonify({"success": False, "message": "内容不能超过500字"})
+
+    data = load_feedback()
+    data['feedbacks'].append({
+        "id": str(int(time.time() * 1000)),
+        "type": feedback_type,
+        "content": content,
+        "is_public": is_public,
+        "created_at": datetime.now().isoformat()
+    })
+    save_feedback(data)
+    return jsonify({"success": True})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
