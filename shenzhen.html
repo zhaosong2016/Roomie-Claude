@@ -121,6 +121,8 @@
 
     .topic-card.selected { border-color: #f7971e; background: #fffbf0; }
     .topic-card.cancelled { border-color: #ff4d4f; background: #fff5f5; cursor: default; }
+    .topic-card.full { border-color: #d9d9d9; background: #fafafa; cursor: default; opacity: 0.75; }
+    .topic-card.full .topic-title::after { content: " [已满]"; color: #aaa; font-size: 13px; font-weight: normal; }
 
     .topic-title { font-size: 15px; font-weight: 700; color: #333; }
     .topic-speaker { font-size: 13px; color: #888; margin-top: 3px; }
@@ -392,7 +394,7 @@ async function loadHomeRank() {
   } else {
     listEl.innerHTML = topics.map((t, i) => `
       <div class="rank-item">
-        <div class="rank-num ${i < 5 ? 'top' : ''}">${i + 1}</div>
+        <div class="rank-num top">${i + 1}</div>
         <div class="rank-info">
           <div class="rank-title">${t.topic}</div>
           <div class="rank-speaker">${t.name} · ${t.company}</div>
@@ -471,7 +473,7 @@ async function loadTopics() {
   listEl.innerHTML = '';
   topics.forEach(t => {
     const card = document.createElement('div');
-    card.className = 'topic-card' + (t.cancelled ? ' cancelled' : '');
+    card.className = 'topic-card' + (t.cancelled ? ' cancelled' : t.full ? ' full' : '');
     card.dataset.id = t.id;
     card.innerHTML = `
       <span class="topic-count">${t.count} 人</span>
@@ -479,7 +481,7 @@ async function loadTopics() {
       <div class="topic-speaker">${t.name} · ${t.company} · ${t.job_title}</div>
       <div class="topic-desc">${t.desc || ''}</div>
     `;
-    if (!t.cancelled) {
+    if (!t.cancelled && !t.full) {
       card.onclick = () => selectTopic(card, t.id, t.topic);
     }
     listEl.appendChild(card);
@@ -572,11 +574,12 @@ function renderAdmin(topics) {
     <div class="admin-topic" id="admin-topic-${t.id}">
       <div class="admin-topic-header">
         <div>
-          <div class="admin-topic-title">${t.topic}${t.cancelled ? ' <span style="color:#ff4d4f;font-size:12px">[已取消]</span>' : ''}</div>
+          <div class="admin-topic-title">${t.topic}${t.cancelled ? ' <span style="color:#ff4d4f;font-size:12px">[已取消]</span>' : t.full ? ' <span style="color:#aaa;font-size:12px">[已满]</span>' : ''}</div>
           <div class="admin-speaker">${t.name} · ${t.company} · ${t.job_title}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <span class="admin-count">${t.signups.length} 人报名</span>
+          ${!t.cancelled ? `<button class="btn-delete" onclick="toggleFull('${t.id}', ${!!t.full})">${t.full ? '重新开放' : '设为满员'}</button>` : ''}
           ${!t.cancelled ? `<button class="btn-delete" onclick="deleteTopic('${t.id}')">删除</button>` : ''}
         </div>
       </div>
@@ -588,6 +591,23 @@ function renderAdmin(topics) {
       </div>
     </div>
   `).join('');
+}
+
+async function toggleFull(topicId, isFull) {
+  const action = isFull ? '重新开放' : '设为满员';
+  if (!confirm(`确认${action}这个话题？`)) return;
+  const res = await fetch(API + '/admin/toggle_full', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminToken },
+    body: JSON.stringify({ topic_id: topicId })
+  });
+  const data = await res.json();
+  if (data.success) {
+    const r2 = await fetch(API + '/admin/topics', { headers: { 'X-Admin-Password': adminToken } });
+    renderAdmin((await r2.json()).topics);
+  } else {
+    alert(data.message || '操作失败');
+  }
 }
 
 async function deleteTopic(topicId) {

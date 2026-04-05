@@ -1268,7 +1268,8 @@ def shenzhen_topics():
             "topic": t['topic'],
             "desc": t.get('desc', ''),
             "count": count,
-            "cancelled": t.get('cancelled', False)
+            "cancelled": t.get('cancelled', False),
+            "full": t.get('full', False)
         })
     # 按报名人数降序，取消的排最后
     result.sort(key=lambda x: (x['cancelled'], -x['count']))
@@ -1287,10 +1288,12 @@ def shenzhen_signup():
 
     data = load_shenzhen()
 
-    # 话题是否存在且未取消
+    # 话题是否存在且未取消、未满员
     topic = next((t for t in data['topics'] if t['id'] == topic_id and not t.get('cancelled')), None)
     if not topic:
         return jsonify({"success": False, "message": "该话题不存在或已取消"})
+    if topic.get('full'):
+        return jsonify({"success": False, "message": "该话题报名已满，请选择其他话题"})
 
     # 分享者不能报名
     is_proposer = any(t['phone'] == phone and not t.get('cancelled') for t in data['topics'])
@@ -1314,6 +1317,13 @@ def shenzhen_signup():
         })
 
     save_shenzhen(data)
+
+    # 报名后检查是否达到10人上限，自动满员
+    current_count = sum(1 for s in data['signups'] if s['topic_id'] == topic_id)
+    if current_count >= 10 and not topic.get('full'):
+        topic['full'] = True
+        save_shenzhen(data)
+
     return jsonify({"success": True, "changed": changed, "topic_name": topic['topic']})
 
 
@@ -1356,6 +1366,24 @@ def shenzhen_admin_topics():
         })
     result.sort(key=lambda x: (x['cancelled'], -len(x['signups'])))
     return jsonify({"topics": result})
+
+
+@app.route('/api/shenzhen/admin/toggle_full', methods=['POST'])
+def shenzhen_admin_toggle_full():
+    if not check_admin(request):
+        return jsonify({"success": False, "message": "无权限"}), 403
+
+    body = request.get_json()
+    topic_id = (body.get('topic_id') or '').strip()
+
+    data = load_shenzhen()
+    topic = next((t for t in data['topics'] if t['id'] == topic_id), None)
+    if not topic:
+        return jsonify({"success": False, "message": "话题不存在"})
+
+    topic['full'] = not topic.get('full', False)
+    save_shenzhen(data)
+    return jsonify({"success": True, "full": topic['full']})
 
 
 @app.route('/api/shenzhen/admin/delete_topic', methods=['POST'])
