@@ -388,7 +388,8 @@ def submit_form():
                             "smoking": matched_partner["smoking"],
                             "schedule": matched_partner["schedule"],
                             "noise_in": matched_partner["noise_in"],
-                            "noise_out": matched_partner["noise_out"]
+                            "noise_out": matched_partner["noise_out"],
+                            "hobby": matched_partner.get("hobby", "")
                         },
                         "message": "您已匹配成功" if not is_pending else "找到匹配，请确认"
                     })
@@ -399,6 +400,8 @@ def submit_form():
                     existing_user[key] = data[key]
             if openid:
                 existing_user["openid"] = openid
+            if "hobby" in data:
+                existing_user["hobby"] = data["hobby"]
             # 使用existing_user作为new_user（避免创建重复记录）
             new_user = existing_user
         else:
@@ -414,6 +417,7 @@ def submit_form():
                 "noise_in": data["noise_in"],
                 "noise_out": data["noise_out"],
                 "has_booked": data.get("has_booked", "no"),
+                "hobby": data.get("hobby", ""),
                 "group_code": data["group_code"],
                 "status": "active",
                 "created_at": time.time(),
@@ -676,7 +680,8 @@ def submit_form():
                     "smoking": matched_user["smoking"],
                     "schedule": matched_user["schedule"],
                     "noise_in": matched_user["noise_in"],
-                    "noise_out": matched_user["noise_out"]
+                    "noise_out": matched_user["noise_out"],
+                    "hobby": matched_user.get("hobby", "")
                 },
                 "message": "匹配成功！"
             })

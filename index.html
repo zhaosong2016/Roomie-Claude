@@ -440,6 +440,11 @@
         </div>
       </div>
     </div>
+    <div class="form-group">
+      <label>讲一件你喜欢做的事 <span style="font-weight:400;color:#aaa;font-size:13px">（选填）</span></label>
+      <textarea id="f-hobby" maxlength="100" placeholder="例如：每天早上跑步、收藏老电影、做咖啡……" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:15px;color:#333;outline:none;resize:none;font-family:inherit;line-height:1.6;height:80px;box-sizing:border-box"></textarea>
+      <div class="hint">匹配成功后会展示给对方</div>
+    </div>
     <div id="form-error" class="alert alert-error" style="display:none"></div>
     <div style="margin-bottom:14px;display:flex;align-items:flex-start;gap:8px">
       <input type="checkbox" id="agree-terms" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer">
@@ -471,6 +476,7 @@
         <div class="info-row"><span class="key">作息倾向</span><span class="val" id="r-schedule"></span></div>
         <div class="info-row"><span class="key">噪音容忍度</span><span class="val" id="r-noise-in"></span></div>
         <div class="info-row"><span class="key">睡眠声响</span><span class="val" id="r-noise-out"></span></div>
+        <div class="info-row" id="r-hobby-row" style="display:none"><span class="key">喜欢做的事</span><span class="val" id="r-hobby"></span></div>
       </div>
       <div id="match-actions">
         <button class="btn btn-primary" onclick="confirmMatch()">确认匹配</button>
@@ -767,6 +773,7 @@
     const noise_in = getRadio('noise_in');
     const noise_out = getRadio('noise_out');
     const has_booked = getRadio('has_booked') || 'no';
+    const hobby = document.getElementById('f-hobby').value.trim();
 
     if (!name || !wechat || !checkin || !checkout || !gender || !smoking || !schedule || !noise_in || !noise_out) {
       errEl.textContent = '请填写所有信息';
@@ -781,7 +788,7 @@
       const res = await fetch(`${API}/api/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, wechat_id: wechat, group_code: groupCode, gender, check_in: checkin, check_out: checkout, smoking, schedule, noise_in, noise_out, has_booked })
+        body: JSON.stringify({ name, wechat_id: wechat, group_code: groupCode, gender, check_in: checkin, check_out: checkout, smoking, schedule, noise_in, noise_out, has_booked, hobby })
       });
       const data = await res.json();
 
@@ -814,6 +821,12 @@
       document.getElementById('r-schedule').textContent = m.schedule === 'early_bird' ? '早睡鸟' : m.schedule === 'night_owl' ? '夜猫子' : '我不介意';
       document.getElementById('r-noise-in').textContent = m.noise_in === 'weak' ? '敏感' : (m.noise_in === 'medium' ? '普通' : '不敏感');
       document.getElementById('r-noise-out').textContent = m.noise_out === 'silent' ? '安静' : (m.noise_out === 'loud' ? '偶有声响' : '声响较大');
+      if (m.hobby) {
+        document.getElementById('r-hobby').textContent = m.hobby;
+        document.getElementById('r-hobby-row').style.display = '';
+      } else {
+        document.getElementById('r-hobby-row').style.display = 'none';
+      }
       document.getElementById('result-matched').style.display = 'block';
       document.getElementById('subset-tip').style.display = data.date_match_type === 'subset' ? 'block' : 'none';
 
