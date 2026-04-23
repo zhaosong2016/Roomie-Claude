@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>深圳游学 | 分享报名</title>
   <style>
@@ -252,13 +253,13 @@
   <!-- 首页 -->
   <div id="page-home" class="page active">
     <div class="entry-cards">
-      <div class="entry-card" onclick="showPage('page-propose')">
+      <div class="entry-card" style="opacity:0.45;cursor:default;pointer-events:none;">
         <h3>🎤 我想分享一个话题</h3>
-        <p>提交你感兴趣的分享主题，票数前5的话题将在4月9日晚带领小组深聊</p>
+        <p>话题提交已截止（4月5日 20:00）</p>
       </div>
       <div class="entry-card" onclick="loadTopics()">
         <h3>📋 我来报名感兴趣的主题</h3>
-        <p>为你最感兴趣的话题投票——票数前5名将成为当晚分组讨论主题，每人只能投一票</p>
+        <p>报名你最感兴趣的主题，每人只能选一个</p>
       </div>
     </div>
 
@@ -358,6 +359,7 @@
   <!-- 管理员面板 -->
   <div id="page-admin" class="page">
     <div class="section-title">管理后台</div>
+    <button class="btn btn-secondary" style="margin-bottom:16px" onclick="exportCSV()">📥 导出报名名单 CSV</button>
     <div id="admin-content"></div>
     <span class="back-link" onclick="showPage('page-home')">← 退出</span>
   </div>
@@ -591,6 +593,31 @@ function renderAdmin(topics) {
       </div>
     </div>
   `).join('');
+}
+
+async function exportCSV() {
+  const res = await fetch(API + '/admin/topics', { headers: { 'X-Admin-Password': adminToken } });
+  const data = await res.json();
+  const topics = data.topics || [];
+
+  const rows = [['姓名', '手机号', '报名话题', '话题提报人', '状态']];
+  topics.forEach(t => {
+    if (t.cancelled) return;
+    const status = t.full ? '已满' : '开放中';
+    if (t.signups.length === 0) return;
+    t.signups.forEach(s => {
+      rows.push([s.name, s.phone, t.topic, t.name, status]);
+    });
+  });
+
+  const csv = '\uFEFF' + rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '深圳游学分享报名名单.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 async function toggleFull(topicId, isFull) {

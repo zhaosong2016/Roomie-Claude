@@ -1070,6 +1070,11 @@ def index():
     return send_file('index.html')
 
 
+@app.route('/favicon.png', methods=['GET'])
+def favicon():
+    return send_file('favicon.png', mimetype='image/png')
+
+
 @app.route('/shenzhen', methods=['GET'])
 def shenzhen_index():
     """深圳游学分享报名"""
