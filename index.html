@@ -415,15 +415,18 @@
       <label>抗噪等级</label>
       <div class="radio-group" style="flex-direction:column">
         <div class="radio-option" style="min-width:100%">
-          <input type="radio" name="noise_in" id="ni-weak" value="weak">
+          <input type="radio" name="noise_in" id="ni-weak" value="weak" onchange="document.getElementById('weak-tip').style.display='block'">
           <label for="ni-weak">[神经衰弱] 有动静就醒</label>
         </div>
+        <div id="weak-tip" style="display:none;margin-top:4px;margin-bottom:4px;padding:8px 12px;background:#fff8e1;border-left:3px solid #f6b700;border-radius:4px;font-size:13px;color:#7a5800">
+          💡 选了神经衰弱，只能匹配对方也是「寂静模式」的室友，范围很窄。除非完全受不了声音，否则建议选「普通玩家」
+        </div>
         <div class="radio-option" style="min-width:100%">
-          <input type="radio" name="noise_in" id="ni-medium" value="medium">
+          <input type="radio" name="noise_in" id="ni-medium" value="medium" onchange="document.getElementById('weak-tip').style.display='none'">
           <label for="ni-medium">[普通玩家] 正常翻身没问题</label>
         </div>
         <div class="radio-option" style="min-width:100%">
-          <input type="radio" name="noise_in" id="ni-strong" value="strong">
+          <input type="radio" name="noise_in" id="ni-strong" value="strong" onchange="document.getElementById('weak-tip').style.display='none'">
           <label for="ni-strong">[雷打不动] 倒头就睡，浑然不觉</label>
         </div>
       </div>
